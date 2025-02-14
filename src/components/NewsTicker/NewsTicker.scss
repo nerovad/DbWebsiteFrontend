@@ -1,0 +1,25 @@
+@use "../../styles/_variables.scss" as *;
+
+.news-ticker {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: $news-ticker-bg-color;
+  color: $news-ticker-text-color;
+  font-family: $news-ticker-font-family;
+  font-size: $news-ticker-font-size;
+  overflow: hidden;
+  z-index: 4;
+  padding: 3px 0;
+}
+
+.ticker {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll $ticker-animation-speed linear infinite;
+}
+
+@keyframes scroll {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-100%); }
+}

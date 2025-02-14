@@ -1,0 +1,41 @@
+@use "../../styles/_variables.scss" as *;
+
+.video-container-dboriginals {
+  display: flex;
+  width: $video-full-size;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.myvideo {
+  width: $video-full-size;
+  height: $video-full-size;
+  position: absolute;
+  object-fit: cover;
+}
+
+.db-originals-next-button {
+  width: $video-full-size;
+  height: $video-full-size;
+  background: $video-bg-color;
+  position: absolute;
+  z-index: 1;
+}
+
+.channelnumber {
+  font-family: $primary-font-family;
+  font-size: $channel-font-size;
+  color: $channel-text-color;
+  margin-left: 40px;
+  margin-top: 20px;
+}
+
+.tv-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
