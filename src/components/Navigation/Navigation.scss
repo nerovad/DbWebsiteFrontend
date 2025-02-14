@@ -76,8 +76,9 @@
 
   &__link img {
     width: 1.5rem;
-    height: 1.5rem;
+    height: 1.4rem;
     transition: transform 0.2s;
+    margin-top: 7px;
 
     &:hover {
       transform: scale(1.1);
