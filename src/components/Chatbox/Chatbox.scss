@@ -1,33 +1,31 @@
 @use "../../styles/_variables.scss" as *;
 
-.trending-container {
+.chatbox-container {
   position: fixed;
   top: 50px; 
-  left: 0;
+  right: 0; // ✅ Placed on the right instead of left
   height: calc(100vh - 100px);
   background-color: $input-bg-color;
   transition: width 0.3s ease-in-out;
-  overflow-y: hidden;
-  overflow-x: hidden;
-  z-index: 1000;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5); // ✅ Shadow to separate it from video
   min-width: 30px;
-  
+
   &.open {
     width: 250px;
+    overflow-y: auto; // Allow scrolling when open
   }
 
   &:not(.open) {
     width: 40px;
-    overflow-y: hidden;
+    overflow: hidden; // Hide scroll bar when closed
   }
 }
-
-.toggle-button-left {
+.toggle-button-right {
   position: absolute;
   top: 10px;
   background-color: transparent;
-  left: calc(100% - 25px);
+  right: calc(100% - 25px);
   border: none;
   cursor: pointer;
   transition: transform 0.3s;
@@ -43,12 +41,12 @@
   }
 }
 
-.trending-channels {
+.chatbox-content {
   padding: 1rem;
   background-color: $input-bg-color;
   color: white;
   opacity: 0;
-  transform: translateX(-10px);
+  transform: translateX(10px);
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   
   &.open {
@@ -62,22 +60,26 @@
     font-size: 1.25rem;
     margin-bottom: 1rem;
     font-weight: bold;
-    margin-top: 2rem;
+    margin-top: 1rem;
+    text-align: center;
   }
 
-  ul {
-    list-style-type: none;
-    padding: 0;
+  .messages {
+    height: 860px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
   }
 
-  li {
-    font-size: 0.875rem;
-    margin-bottom: 1rem;
-
-    h4 {
-      font-size: 0.75rem;
-      color: $primary-color-red;
-    }
+  input {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
   }
 }
 

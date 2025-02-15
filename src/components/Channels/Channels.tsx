@@ -25,7 +25,7 @@ const Channels: React.FC<ChannelsProps> = ({ isOpen, setIsOpen }) => {
 
   return (
     <div className={`trending-container ${isOpen ? "open" : ""}`}>
-      <button className="toggle-button" onClick={toggleMenu}>
+      <button className="toggle-button-left" onClick={toggleMenu}>
         <img src={LeftArrowIcon} alt="Toggle" />
       </button>
       <div className={`trending-channels ${isOpen ? "open" : ""}`}>

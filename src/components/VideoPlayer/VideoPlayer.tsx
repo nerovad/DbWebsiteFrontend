@@ -5,9 +5,10 @@ import "../../styles/_variables.scss";
 
 interface VideoPlayerProps {
   isMenuOpen: boolean;
+  isChatOpen: boolean;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsInstance = useRef<Hls | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -95,8 +96,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen }) => {
     loadVideo(videoLinks[currentIndex].src);
   }, [currentIndex]);
 
+  // Dynamically Apply Classes Based on Sidebar & Chatbox States
+  const getClassNames = () => {
+    if (isMenuOpen && isChatOpen) return "expanded-both";
+    if (isMenuOpen) return "expanded-left";
+    if (isChatOpen) return "expanded-right";
+    return "";
+  };
+
   return (
-    <div className={`video-container-dboriginals ${isMenuOpen ? "expanded" : ""}`}>
+    <div className={`video-container-dboriginals ${getClassNames()}`}>
       <div className="tv-container">
         <video
           className="myvideo"

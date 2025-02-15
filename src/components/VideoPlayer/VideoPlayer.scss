@@ -11,7 +11,22 @@
   background-color: $video-bg-color;
   max-width: 100%;
   max-height: 100%;
+  margin-left: 40px;
+  margin-right: 40px;
   transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+
+  &.expanded-left {
+    margin-left: 250px;
+  }
+
+  &.expanded-right {
+    margin-right: 250px;
+  }
+
+  &.expanded-both {
+    margin-left: 250px;
+    margin-right: 250px;
+  }
 }
 
 .tv-container {
@@ -23,19 +38,15 @@
   align-items: center;
   background-color: black;
   overflow: hidden;
+}
 
-  &.expanded {
-    margin-left: 250px; // Sidebar open
-  }
-  .myvideo {
+.myvideo {
   width: 100%;
   height: 100%;
   object-fit: cover;
   position: absolute;
   top: 0;
   left: 0;
-}
-
 }
 
 .db-originals-next-button {
