@@ -14,6 +14,8 @@ const NewsTicker: React.FC = () => {
           Press 'm' to mute/unmute
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           Want your own channel? Submit your work to us for review.
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          Check out channel 99 for Friday Night Rewind: Live!
         </p>
       </div>
     </div>

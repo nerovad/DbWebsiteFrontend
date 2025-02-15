@@ -2,40 +2,58 @@
 
 .video-container-dboriginals {
   display: flex;
-  width: $video-full-size;
-  height: 100vh;
   justify-content: center;
   align-items: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
   position: relative;
-  z-index: 1;
+  background-color: $video-bg-color;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.tv-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+   max-width: 100vw;  // Prevent scrolling horizontally
+  max-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  overflow: hidden;
 }
 
 .myvideo {
-  width: $video-full-size;
-  height: $video-full-size;
-  position: absolute;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .db-originals-next-button {
-  width: $video-full-size;
-  height: $video-full-size;
-  background: $video-bg-color;
   position: absolute;
-  z-index: 1;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  background: transparent;
+  cursor: pointer;
 }
 
 .channelnumber {
   font-family: $primary-font-family;
   font-size: $channel-font-size;
   color: $channel-text-color;
-  margin-left: 40px;
-  margin-top: 20px;
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  z-index: 3;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
-.tv-container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
