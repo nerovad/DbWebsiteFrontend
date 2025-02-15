@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Channels.scss";
 import LeftArrowIcon from "../../assets/Left_Arrow.svg";
 
-const Channels: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChannelsProps {
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+const Channels: React.FC<ChannelsProps> = ({ isOpen, setIsOpen }) => {
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   const channels = [
     { name: "Channel 2: Dain Bramage", viewers: "27.4k watching" },

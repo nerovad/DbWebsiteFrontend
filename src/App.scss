@@ -1,0 +1,39 @@
+@use "./styles/_variables.scss" as *;
+
+.app-grid {
+  display: grid;
+  grid-template-rows: 60px auto 40px; /* Navbar, Content, Ticker */
+  grid-template-columns: 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 100px);
+}
+
+/* Sidebar */
+.trending-container {
+  transition: width 0.3s ease-in-out;
+  width: 70px; /* Default collapsed */
+  background-color: $input-bg-color;
+  overflow-y: auto;
+
+  &.open {
+    width: 250px;
+  }
+}
+
+/* Video Player adjusts based on sidebar */
+.video-container-dboriginals {
+  flex: 1; /* Takes remaining space */
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 70px; /* Default with collapsed menu */
+
+  &.expanded {
+    margin-left: 250px;
+  }
+}
+
