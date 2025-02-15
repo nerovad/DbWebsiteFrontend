@@ -2,15 +2,16 @@
 
 .trending-container {
   position: fixed;
-  top: 60px; 
+  top: 50px; 
   left: 0;
-  height: calc(100vh - 30px);
+  height: calc(100vh - 100px);
   background-color: $input-bg-color;
   transition: width 0.3s ease-in-out;
-  overflow-y: auto;
+  overflow-y: hidden;
+  overflow-x: hidden;
   z-index: 1000;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  min-width: 70px;
+  min-width: 30px;
   z-index: 10000;
   
   &.open {
@@ -44,7 +45,7 @@
 
 .trending-channels {
   padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: $input-bg-color;
   color: white;
   opacity: 0;
   transform: translateX(-10px);

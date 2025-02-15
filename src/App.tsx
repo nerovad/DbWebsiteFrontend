@@ -8,9 +8,10 @@ const App: React.FC = () => {
   return (
     <div>
       <NavBar />
-      <Channels />
-      <main className="p-4"> {/* Your main content goes here */}</main>
-      <VideoPlayer />
+      <div className="main-content">
+        <Channels />
+        <VideoPlayer />
+      </div>
       <NewsTicker />
     </div>
   );
