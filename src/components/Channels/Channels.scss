@@ -1,0 +1,81 @@
+@use "../../styles/_variables.scss" as *;
+
+.trending-container {
+  position: fixed;
+  top: 60px; 
+  left: 0;
+  height: calc(100vh - 30px);
+  background-color: $input-bg-color;
+  transition: width 0.3s ease-in-out;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  min-width: 70px;
+  z-index: 10000;
+  
+  &.open {
+    width: 250px;
+  }
+
+  &:not(.open) {
+    width: 70px;
+  }
+}
+
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  background-color: transparent;
+  left: calc(100% - 10px);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s;
+  z-index:10000;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.trending-channels {
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  
+  &.open {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  li {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+
+    h4 {
+      font-size: 0.75rem;
+      color: $primary-color-red;
+    }
+  }
+}
+
