@@ -29,11 +29,22 @@
 /* Video Player adjusts based on sidebar */
 .video-container-dboriginals {
   flex: 1; /* Takes remaining space */
-  transition: margin-left 0.3s ease-in-out;
-  margin-left: 70px; /* Default with collapsed menu */
+  transition: margin-left 0.3s ease-in-out, margin-right 0.3s ease-in-out;
+  margin-left: 40px; /* Default when collapsed */
+  margin-right: 40px; /* Default for right spacing */
 
-  &.expanded {
+  &.expanded-left {
+    margin-left: 250px; /* When menu opens */
+  }
+
+  &.expanded-right {
+    margin-right: 250px; /* When chatbox opens */
+  }
+
+  &.expanded-both {
     margin-left: 250px;
+    margin-right: 250px;
   }
 }
+
 

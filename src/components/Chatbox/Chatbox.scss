@@ -3,22 +3,22 @@
 .chatbox-container {
   position: fixed;
   top: 50px; 
-  right: 0; // ✅ Placed on the right instead of left
+  right: 0; 
   height: calc(100vh - 100px);
   background-color: $input-bg-color;
   transition: width 0.3s ease-in-out;
   z-index: 10000;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5); // ✅ Shadow to separate it from video
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5); 
   min-width: 30px;
 
   &.open {
     width: 250px;
-    overflow-y: auto; // Allow scrolling when open
+    overflow-y: auto; 
   }
 
   &:not(.open) {
     width: 40px;
-    overflow: hidden; // Hide scroll bar when closed
+    overflow: hidden; 
   }
 }
 .toggle-button-right {
