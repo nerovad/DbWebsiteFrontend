@@ -98,11 +98,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
 
   // Dynamically Apply Classes Based on Sidebar & Chatbox States
   const getClassNames = () => {
-    if (isMenuOpen && isChatOpen) return "expanded-both";
-    if (isMenuOpen) return "expanded-left";
-    if (isChatOpen) return "expanded-right";
-    return "";
+    let classNames = "";
+
+    if (isMenuOpen) classNames += " expanded-left";
+    if (isChatOpen) classNames += " expanded-right";
+    if (isMenuOpen && isChatOpen) classNames = "expanded-both";
+
+    return classNames.trim();
   };
+
 
   return (
     <div className={`video-container-dboriginals ${getClassNames()}`}>
