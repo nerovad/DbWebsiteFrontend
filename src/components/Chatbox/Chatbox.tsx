@@ -18,9 +18,15 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
       <div className={`chatbox-content ${isOpen ? "open" : ""}`}>
         <h3>Live Chat</h3>
         <div className="messages">
-          <p>User1: Hey, what's up?</p>
-          <p>User2: Loving this stream!</p>
-          <p>User3: When's the next episode?</p>
+          <p>BurtonGizzy: Hey, what's up?</p>
+          <p>TurdFerguson3: I love my farts</p>
+          <p>Ulansma294: When's the next episode?</p>
+          <p>BurtonGizzy: Hey, what's up?</p>
+          <p>TurdFerguson3: I love my farts</p>
+          <p>Ulansma294: When's the next episode?</p>
+          <p>BurtonGizzy: Hey, what's up?</p>
+          <p>TurdFerguson3: I love my farts</p>
+          <p>Ulansma294: When's the next episode?</p>
         </div>
         <input type="text" placeholder="Type a message..." />
       </div>
