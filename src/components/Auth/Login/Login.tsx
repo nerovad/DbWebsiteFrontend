@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Auth.scss";
 
-const Login: React.FC = () => {
+interface LoginProps {
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Login: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -19,6 +23,7 @@ const Login: React.FC = () => {
     const data = await response.json();
     if (response.ok) {
       localStorage.setItem("token", data.token);
+      setIsLoggedIn(true); // ✅ Immediately update state
       navigate("/");
     } else {
       alert(data.error);
