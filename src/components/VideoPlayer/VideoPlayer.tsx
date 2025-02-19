@@ -52,6 +52,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     }
   };
 
+
+  // Debug channelId update
+  useEffect(() => {
+    console.log(`VideoPlayer confirmed channelId: ${channelId}`);
+  }, [channelId]);
+
   // Play Next Video
   const goToNextVideo = () => {
     const nextIndex = (currentIndex + 1) % videoLinks.length;
