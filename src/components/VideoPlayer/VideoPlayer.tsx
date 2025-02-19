@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import "./VideoPlayer.scss";
+import Chatbox from "../Chatbox/Chatbox";
 import "../../styles/_variables.scss";
 
 interface VideoPlayerProps {
@@ -12,11 +13,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsInstance = useRef<Hls | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [channelId, setChannelId] = useState("default-channel");
   const [channelName, setChannelName] = useState("");
 
   // Video Sources
   const videoLinks = [
-    { src: "videos/Color_Bars_DB_Web.mp4", channel: "" },
+    { src: "videos/Color_Bars_DB_Web.mp4", channel: "Default" },
     { src: "https://dainbramage.tv:8088/channel2/channel2.m3u8", channel: "Channel 2: Dain Bramage" },
     { src: "https://dainbramage.tv:8088/channel17/channel17.m3u8", channel: "Channel 17: Music" },
     { src: "https://dainbramage.tv:8088/channel29/channel29.m3u8", channel: "Channel 29: Skateboarding" },
@@ -42,9 +44,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
         videoElement.play();
       });
       hlsInstance.current = hls;
-    }
-    // For regular MP4 streams
-    else {
+    } else {
+      // For MP4 Streams
       videoElement.src = src;
       videoElement.load();
       videoElement.play().catch(() => console.error("AutoPlay failed"));
@@ -58,6 +59,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     loadVideo(videoLinks[nextIndex].src);
     setChannelName(videoLinks[nextIndex].channel);
 
+    // Generate a unique channel ID based on the video index
+    const newChannelId = `channel-${nextIndex}`;
+    console.log(`🔹 Updating channelId to: ${newChannelId}`);
+    setChannelId(newChannelId);
+
     // Hide Channel Name after 7 seconds
     setTimeout(() => setChannelName(""), 7000);
   };
@@ -68,6 +74,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     setCurrentIndex(prevIndex);
     loadVideo(videoLinks[prevIndex].src);
     setChannelName(videoLinks[prevIndex].channel);
+
+    // Generate a unique channel ID for chat
+    setChannelId(`channel-${prevIndex}`);
 
     // Hide Channel Name after 7 seconds
     setTimeout(() => setChannelName(""), 7000);
@@ -99,14 +108,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
   // Dynamically Apply Classes Based on Sidebar & Chatbox States
   const getClassNames = () => {
     let classNames = "";
-
     if (isMenuOpen) classNames += " expanded-left";
     if (isChatOpen) classNames += " expanded-right";
     if (isMenuOpen && isChatOpen) classNames = "expanded-both";
-
     return classNames.trim();
   };
-
 
   return (
     <div className={`video-container-dboriginals ${getClassNames()}`}>
@@ -126,6 +132,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
           <div className="channelnumber">{channelName}</div>
         </div>
       </div>
+
+      {/*Chatbox is now properly included */}
+      <Chatbox isOpen={isChatOpen} setIsOpen={() => { }} channelId={channelId || "default-channel"} />
     </div>
   );
 };
