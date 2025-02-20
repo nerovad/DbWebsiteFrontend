@@ -1,23 +1,20 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import "./Chatbox.scss";
+import { useChatStore } from "../../store/useChatStore"; // ✅ Zustand Store
 
-// Connect to WebSocket server
 const socket = io("http://localhost:5000");
 
 interface ChatboxProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  channelId: string;
 }
 
-const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen, channelId }) => {
+const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
+  const { channelId, userId, setUserId, messages, setMessages, addMessage } = useChatStore();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<{ user: string; content: string }[]>([]);
-  const [userId, setUserId] = useState<number | null>(null);
-  const channelIdRef = useRef(channelId); // ✅ Store latest channelId
 
-  // Fetch user ID from localStorage (stored during login)
+  // ✅ Fetch userId from localStorage **before using it in messages**
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -26,24 +23,25 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen, channelId }) => {
       })
         .then((res) => res.json())
         .then((data) => {
-          if (data && data.id) {
+          if (data?.id) {
+            console.log(`Loaded userId: ${data.id}`);
             setUserId(data.id);
+          } else {
+            console.error("❌ No userId found in profile response!");
           }
         })
-        .catch((err) => console.error("Error fetching user ID:", err));
+        .catch((err) => console.error("❌ Error fetching user ID:", err));
     }
-  }, []);
+  }, [setUserId]); // ✅ Runs once when the component mounts
 
-  // ✅ Ensure `channelIdRef` updates properly
+  // ✅ Join room when `channelId` updates
   useEffect(() => {
+    console.log(` Chatbox detected new channelId: ${channelId}`);
     if (channelId) {
-      channelIdRef.current = channelId; // ✅ Update ref with latest channelId
-      console.log(` Chatbox detected new channelId: ${channelIdRef.current}`);
-
-      socket.emit("joinRoom", { channelId: channelIdRef.current });
+      socket.emit("joinRoom", { channelId });
 
       socket.on("chatHistory", (chatHistory) => {
-        console.log(" Chat History Loaded:", chatHistory);
+        console.log("Chat History Loaded:", chatHistory);
         setMessages(chatHistory);
       });
 
@@ -53,21 +51,33 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen, channelId }) => {
     }
   }, [channelId]);
 
-  // ✅ Ensure the correct `channelId` is used before sending a message
+
   const sendMessage = () => {
-    const currentChannelId = channelIdRef.current; // ✅ Get latest channelId
-
-    console.log(" Preparing to send message...", { userId, channelId: currentChannelId, message });
-
-    if (!userId || !currentChannelId || message.trim() === "") {
-      console.log("❌ Cannot send message. Missing values:", { userId, channelId: currentChannelId, message });
+    if (!userId || !channelId || message.trim() === "") {
+      console.log("❌ Cannot send message. Missing values:", { userId, channelId, message });
       return;
     }
 
-    console.log(` Sending message to room ${currentChannelId}: "${message}" from user ${userId}`);
-    socket.emit("sendMessage", { userId, message, channelId: currentChannelId });
+    console.log(`🚀 Sending message to room ${channelId}: "${message}" from user ${userId}`);
+    socket.emit("sendMessage", { userId, message, channelId });
+
+    // ✅ Fetch the username from Zustand or set fallback as "Unknown"
+    fetch("http://localhost:5000/profile", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const username = data?.username || "Unknown";
+        addMessage({ user: username, content: message });
+      })
+      .catch((err) => {
+        console.error("❌ Error fetching username:", err);
+        addMessage({ user: "Unknown", content: message }); // Fallback
+      });
+
     setMessage("");
   };
+
 
   return (
     <div className={`chatbox-container ${isOpen ? "open" : ""}`}>
@@ -75,9 +85,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen, channelId }) => {
         <h3>Live Chat</h3>
         <div className="messages">
           {messages.map((msg, index) => (
-            <p key={index}>
-              <strong>{msg.user}:</strong> {msg.content}
-            </p>
+            <p key={index}><strong>{msg.user}:</strong> {msg.content}</p>
           ))}
         </div>
         <input

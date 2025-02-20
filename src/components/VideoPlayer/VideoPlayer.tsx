@@ -3,6 +3,7 @@ import Hls from "hls.js";
 import "./VideoPlayer.scss";
 import Chatbox from "../Chatbox/Chatbox";
 import "../../styles/_variables.scss";
+import { useChatStore } from "../../store/useChatStore"; // ✅ Import Zustand Store
 
 interface VideoPlayerProps {
   isMenuOpen: boolean;
@@ -12,60 +13,60 @@ interface VideoPlayerProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsInstance = useRef<Hls | null>(null);
+  const { channelId, setChannelId } = useChatStore(); // ✅ Zustand state
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [channelId, setChannelId] = useState("default-channel");
   const [channelName, setChannelName] = useState("");
 
-  // Video Sources
+  // ✅ Video Sources
   const videoLinks = [
-    { src: "videos/Color_Bars_DB_Web.mp4", channel: "Default" },
-    { src: "https://dainbramage.tv:8088/channel2/channel2.m3u8", channel: "Channel 2: Dain Bramage" },
-    { src: "https://dainbramage.tv:8088/channel17/channel17.m3u8", channel: "Channel 17: Music" },
-    { src: "https://dainbramage.tv:8088/channel29/channel29.m3u8", channel: "Channel 29: Skateboarding" },
-    { src: "https://dainbramage.tv:8088/channel31/channel31.m3u8", channel: "Channel 31: Horror" }
+    { src: "/videos/Color_Bars_DB_Web.mp4", channel: "channel-0" },
+    { src: "https://dainbramage.tv:8088/channel2/channel2.m3u8", channel: "channel-1" },
+    { src: "https://dainbramage.tv:8088/channel17/channel17.m3u8", channel: "channel-2" },
+    { src: "https://dainbramage.tv:8088/channel29/channel29.m3u8", channel: "channel-3" },
+    { src: "https://dainbramage.tv:8088/channel31/channel31.m3u8", channel: "channel-4" }
   ];
 
-  // Function to Load Video
+  // ✅ Load Video Function
   const loadVideo = (src: string) => {
+    console.log(` Loading video: ${src}`); // ✅ Debugging log
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
-    // Clean up previous HLS instance
+    // Cleanup previous instance
     if (hlsInstance.current) {
       hlsInstance.current.destroy();
     }
 
-    // Handle HLS Streams (.m3u8)
     if (src.endsWith(".m3u8") && Hls.isSupported()) {
+      console.log("HLS stream detected, using HLS.js");
       const hls = new Hls();
       hls.loadSource(src);
       hls.attachMedia(videoElement);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        videoElement.play();
+        videoElement.play().catch(() => console.error(" AutoPlay failed!"));
       });
       hlsInstance.current = hls;
-    } else {
-      // For MP4 Streams
+    } else if (src.endsWith(".mp4")) {
+      console.log("MP4 file detected, using native player");
       videoElement.src = src;
       videoElement.load();
-      videoElement.play().catch(() => console.error("AutoPlay failed"));
+      videoElement.play().catch(() => console.error(" AutoPlay failed!"));
+    } else {
+      console.error("Invalid video format: ", src);
     }
   };
 
 
-  // Debug channelId update
-  useEffect(() => {
-    console.log(`VideoPlayer confirmed channelId: ${channelId}`);
-  }, [channelId]);
+  // ✅ Go to Next Video
 
-  // Play Next Video
   const goToNextVideo = () => {
+    console.log("▶️ goToNextVideo() triggered!"); // ✅ Debugging
     const nextIndex = (currentIndex + 1) % videoLinks.length;
     setCurrentIndex(nextIndex);
     loadVideo(videoLinks[nextIndex].src);
     setChannelName(videoLinks[nextIndex].channel);
 
-    // Generate a unique channel ID based on the video index
+    // Generate a unique chat room ID for the new video
     const newChannelId = `channel-${nextIndex}`;
     console.log(`🔹 Updating channelId to: ${newChannelId}`);
     setChannelId(newChannelId);
@@ -74,75 +75,37 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     setTimeout(() => setChannelName(""), 7000);
   };
 
-  // Play Previous Video
-  const goToPreviousVideo = () => {
-    const prevIndex = (currentIndex - 1 + videoLinks.length) % videoLinks.length;
-    setCurrentIndex(prevIndex);
-    loadVideo(videoLinks[prevIndex].src);
-    setChannelName(videoLinks[prevIndex].channel);
-
-    // Generate a unique channel ID for chat
-    setChannelId(`channel-${prevIndex}`);
-
-    // Hide Channel Name after 7 seconds
-    setTimeout(() => setChannelName(""), 7000);
-  };
-
-  // Handle Keyboard Controls
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowUp") {
-        goToNextVideo();
-      } else if (e.key === "ArrowDown") {
-        goToPreviousVideo();
-      } else if (e.key === "m") {
-        if (videoRef.current) {
-          videoRef.current.muted = !videoRef.current.muted;
-        }
-      }
-    };
+    console.log(` VideoPlayer confirmed channelId: ${channelId}`);
+  }, [channelId]);
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex]);
-
-  // Play First Video on Load
   useEffect(() => {
     loadVideo(videoLinks[currentIndex].src);
   }, [currentIndex]);
 
-  // Dynamically Apply Classes Based on Sidebar & Chatbox States
-  const getClassNames = () => {
-    let classNames = "";
-    if (isMenuOpen) classNames += " expanded-left";
-    if (isChatOpen) classNames += " expanded-right";
-    if (isMenuOpen && isChatOpen) classNames = "expanded-both";
-    return classNames.trim();
-  };
 
   return (
-    <div className={`video-container-dboriginals ${getClassNames()}`}>
+    <div className="video-container-dboriginals">
       <div className="tv-container">
         <video
-          className="myvideo"
           ref={videoRef}
           muted
           autoPlay
           preload="metadata"
           onEnded={goToNextVideo}
-          disablePictureInPicture
           controls={false}
         ></video>
 
+        {/* ✅ Click this to go to the next video */}
         <div className="db-originals-next-button" onClick={goToNextVideo}>
           <div className="channelnumber">{channelName}</div>
         </div>
       </div>
 
-      {/*Chatbox is now properly included */}
-      <Chatbox isOpen={isChatOpen} setIsOpen={() => { }} channelId={channelId || "default-channel"} />
+      <Chatbox isOpen={isChatOpen} setIsOpen={() => { }} />
     </div>
   );
+
 };
 
 export default VideoPlayer;

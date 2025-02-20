@@ -1,23 +1,30 @@
 import { create } from "zustand";
 
 interface ChatState {
-  channelId: string;
   userId: number | null;
+  channelId: string;
   messages: { user: string; content: string }[];
-  setChannelId: (channelId: string) => void;
-  setUserId: (userId: number) => void;
+  setUserId: (id: number) => void;
+  setChannelId: (id: string) => void;
   setMessages: (messages: { user: string; content: string }[]) => void;
   addMessage: (message: { user: string; content: string }) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
+  userId: null, // ✅ Starts as null
   channelId: "default-channel",
-  userId: null,
   messages: [],
 
-  setChannelId: (channelId) => set({ channelId }),
-  setUserId: (userId) => set({ userId }),
+  setUserId: (id) => set({ userId: id }),
+
+  setChannelId: (id) => {
+    console.log(` Zustand: Updating channelId to ${id}`);
+    set({ channelId: id });
+  },
+
   setMessages: (messages) => set({ messages }),
-  addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
+
+  addMessage: (message) =>
+    set((state) => ({ messages: [...state.messages, message] })),
 }));
 
