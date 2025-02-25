@@ -26,6 +26,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     { src: "https://dainbramage.tv:8088/channel31/channel31.m3u8", channel: "channel-4" }
   ];
 
+
+  const getClassNames = () => {
+    let classNames = "";
+
+    if (isMenuOpen) classNames += " expanded-left";
+    if (isChatOpen) classNames += " expanded-right";
+    if (isMenuOpen && isChatOpen) classNames = "expanded-both";
+
+    return classNames.trim();
+  };
+
   // ✅ Load Video Function
   const loadVideo = (src: string) => {
     console.log(` Loading video: ${src}`); // ✅ Debugging log
@@ -85,7 +96,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
 
 
   return (
-    <div className="video-container-dboriginals">
+    <div className={`video-container-dboriginals ${getClassNames()}`}>
       <div className="tv-container">
         <video
           ref={videoRef}
