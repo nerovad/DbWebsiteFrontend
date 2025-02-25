@@ -16,7 +16,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
   const { channelId, userId, setUserId, messages, setMessages, addMessage } = useChatStore();
   const [message, setMessage] = useState("");
 
-  // ✅ Fetch userId from localStorage **before using it in messages**
+  // Fetch userId from localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -37,14 +37,23 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
   }, [setUserId]); // ✅ Runs once when the component mounts
 
   // ✅ Join room when `channelId` updates
+
   useEffect(() => {
-    console.log(` Chatbox detected new channelId: ${channelId}`);
+    console.log(`Chatbox detected new channelId: ${channelId}`);
     if (channelId) {
       socket.emit("joinRoom", { channelId });
 
       socket.on("chatHistory", (chatHistory) => {
-        console.log("Chat History Loaded:", chatHistory);
-        setMessages(chatHistory);
+        console.log("📜 Chat History Loaded:", chatHistory);
+
+        // ✅ Ensure each message has a 'user' field before saving to Zustand
+        const formattedMessages = chatHistory.map((msg) => ({
+          user: msg.username || "Unknown", // Fallback if username is missing
+          content: msg.content,
+          created_at: msg.created_at,
+        }));
+
+        setMessages(formattedMessages);
       });
 
       return () => {
