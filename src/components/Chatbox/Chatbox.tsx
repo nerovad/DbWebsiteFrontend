@@ -72,7 +72,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
     console.log(`Sending message to room ${channelId}: "${message}" from user ${userId}`);
     socket.emit("sendMessage", { userId, message, channelId });
 
-    // ✅ Fetch the username from Zustand or set fallback as "Unknown"
+    // Fetch the username from Zustand or set fallback as "Unknown"
     fetch("http://localhost:5000/profile", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
@@ -106,7 +106,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
-        <button onClick={sendMessage}>Send</button>
+        <button className="chat-button" onClick={sendMessage}>Send</button>
       </div>
     </div>
   );
