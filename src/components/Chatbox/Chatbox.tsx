@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import "./Chatbox.scss";
-import { useChatStore } from "../../store/useChatStore"; // ✅ Zustand Store
+import { useChatStore } from "../../store/useChatStore";
 
-const socket = io("http://localhost:5000");
+const socket = io("http://localhost:5000", {
+  withCredentials: true,
+});
 
 interface ChatboxProps {
   isOpen: boolean;
@@ -27,10 +29,10 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
             console.log(`Loaded userId: ${data.id}`);
             setUserId(data.id);
           } else {
-            console.error("❌ No userId found in profile response!");
+            console.error("No userId found in profile response!");
           }
         })
-        .catch((err) => console.error("❌ Error fetching user ID:", err));
+        .catch((err) => console.error("Error fetching user ID:", err));
     }
   }, [setUserId]); // ✅ Runs once when the component mounts
 
@@ -54,11 +56,11 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
 
   const sendMessage = () => {
     if (!userId || !channelId || message.trim() === "") {
-      console.log("❌ Cannot send message. Missing values:", { userId, channelId, message });
+      console.log("Cannot send message. Missing values:", { userId, channelId, message });
       return;
     }
 
-    console.log(`🚀 Sending message to room ${channelId}: "${message}" from user ${userId}`);
+    console.log(`Sending message to room ${channelId}: "${message}" from user ${userId}`);
     socket.emit("sendMessage", { userId, message, channelId });
 
     // ✅ Fetch the username from Zustand or set fallback as "Unknown"
@@ -71,7 +73,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
         addMessage({ user: username, content: message });
       })
       .catch((err) => {
-        console.error("❌ Error fetching username:", err);
+        console.error("Error fetching username:", err);
         addMessage({ user: "Unknown", content: message }); // Fallback
       });
 
