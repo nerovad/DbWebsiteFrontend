@@ -29,12 +29,18 @@
   right: calc(100% - 30px);
   border: none;
   cursor: pointer;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease-in-out;
   z-index: 10000;
 
   img {
     width: 20px;
     height: 20px;
+    transition: transform 0.3s ease-in-out;
+    transform: rotate(180deg);
+  }
+  
+  &.open img {
+    transform: rotate(0deg);
   }
 
   &:hover {

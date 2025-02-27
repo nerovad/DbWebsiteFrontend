@@ -3,7 +3,7 @@ import Hls from "hls.js";
 import "./VideoPlayer.scss";
 import Chatbox from "../Chatbox/Chatbox";
 import "../../styles/_variables.scss";
-import { useChatStore } from "../../store/useChatStore"; // ✅ Import Zustand Store
+import { useChatStore } from "../../store/useChatStore";
 
 interface VideoPlayerProps {
   isMenuOpen: boolean;
@@ -71,7 +71,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
   // ✅ Go to Next Video
 
   const goToNextVideo = () => {
-    console.log("▶️ goToNextVideo() triggered!"); // ✅ Debugging
+    console.log("goToNextVideo() triggered!"); // ✅ Debugging
     const nextIndex = (currentIndex + 1) % videoLinks.length;
     setCurrentIndex(nextIndex);
     loadVideo(videoLinks[nextIndex].src);
@@ -79,7 +79,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
 
     // Generate a unique chat room ID for the new video
     const newChannelId = `channel-${nextIndex}`;
-    console.log(`🔹 Updating channelId to: ${newChannelId}`);
+    console.log(`Updating channelId to: ${newChannelId}`);
     setChannelId(newChannelId);
 
     // Hide Channel Name after 7 seconds
@@ -87,7 +87,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
   };
 
   useEffect(() => {
-    console.log(` VideoPlayer confirmed channelId: ${channelId}`);
+    console.log(`VideoPlayer confirmed channelId: ${channelId}`);
   }, [channelId]);
 
   useEffect(() => {
@@ -99,6 +99,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     <div className={`video-container-dboriginals ${getClassNames()}`}>
       <div className="tv-container">
         <video
+          className="myvideo"
           ref={videoRef}
           muted
           autoPlay
@@ -107,7 +108,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
           controls={false}
         ></video>
 
-        {/* ✅ Click this to go to the next video */}
+        {/*Click this to go to the next video */}
         <div className="db-originals-next-button" onClick={goToNextVideo}>
           <div className="channelnumber">{channelName}</div>
         </div>

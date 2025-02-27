@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import "./Chatbox.scss";
+import RightArrowIcon from "../../assets/Right_Arrow.svg";
 import { useChatStore } from "../../store/useChatStore";
 
 const socket = io("http://localhost:5000", {
@@ -92,6 +93,11 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
 
   return (
     <div className={`chatbox-container ${isOpen ? "open" : ""}`}>
+
+      <button className={`toggle-button-right ${isOpen ? "open" : ""}`} onClick={() => setIsOpen(!isOpen)}>
+        <img src={RightArrowIcon} alt="Toggle Chat" />
+      </button>
+
       <div className={`chatbox-content ${isOpen ? "open" : ""}`}>
         <h3>Live Chat</h3>
         <div className="messages">
