@@ -1,52 +1,49 @@
-$primary-color-yellow: #EAA612;
-$primary-color-red: #C1272D;
-$input-bg-color: #141115;
-$input-border-color: #262626;
+@use "../../styles/_variables.scss" as *;
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 .floating-remote {
   position: fixed;
-  bottom: 50px;
-  right: 20px;
-  width: 140px;
-  padding: 15px;
-  background: linear-gradient(to bottom, $input-bg-color, darken($input-bg-color, 10%)); // ✅ Sleek dark gradient
-  border-radius: 15px;
+  top: 470px;
+  right: 820px;
+  width: 150px;
+  padding: 20px;
+  background: linear-gradient(to bottom, $input-bg-color, darken($input-bg-color, 10%)); // ✅ Smooth dark gradient
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0px 0px 10px rgba($primary-color-yellow, 0.3); // ✅ Subtle neon glow
-  border: 2px solid rgba($primary-color-yellow, 0.5);
+  box-shadow: 0px 0px 10px rgba($primary-color-red, 0.4); // ✅ Neon glow effect
+  border: 2px solid rgba($primary-color-red-hover, 0.6);
   z-index: 10005;
   pointer-events: auto;
-  font-family: 'Orbitron', sans-serif;
+  font-family: $primary-font-family;
   color: white;
   text-align: center;
 }
 
-/* Buttons with Neon Glow */
+/* Buttons - Modern Neon Glow */
 .close-btn, .channel-up, .channel-down, .mute-btn, .fullscreen-btn {
-  width: 100px;
-  height: 40px;
+  width: 110px;
+  height: 42px;
   border-radius: 8px;
   border: none;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 15px;
+  font-weight: 600;
   text-transform: uppercase;
-  margin: 5px;
+  margin: 6px;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   background: black;
-  box-shadow: 0px 0px 5px rgba($primary-color-yellow, 0.4);
+  box-shadow: 0px 0px 10px rgba($primary-color-red, 0.5);
   color: white;
   font-family: inherit;
-  letter-spacing: 1px;
-  text-shadow: 0px 0px 5px rgba($primary-color-yellow, 0.7);
+  letter-spacing: 0.5px;
+  text-shadow: 0px 0px 8px rgba($primary-color-red, 0.8);
 
   &:hover {
-    background: rgba($primary-color-yellow, 0.2);
-    box-shadow: 0px 0px 12px rgba($primary-color-yellow, 0.9);
+    background: rgba($primary-color-red, 0.2);
+    box-shadow: 0px 0px 18px rgba($primary-color-red, 1);
   }
 
   &:active {
@@ -56,45 +53,46 @@ $input-border-color: #262626;
 
 /* Power Button */
 .close-btn {
-  background: $primary-color-red;
-  box-shadow: 0px 0px 8px rgba($primary-color-red, 0.7);
+  background: none;
+  box-shadow: 0px 0px 12px rgba($primary-color-red, 0.7);
   transition: all 0.3s ease-in-out;
+  width: 30%;
 
   &:hover {
-    background: darken($primary-color-red, 10%);
-    box-shadow: 0px 0px 15px rgba($primary-color-red, 1);
+    background: darken($primary-color-yellow, 10%);
+    box-shadow: 0px 0px 20px rgba($primary-color-red, 1);
   }
 }
 
 /* Channel Buttons */
 .channel-up, .channel-down {
-  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 10%));
-  box-shadow: 0px 0px 5px rgba($primary-color-yellow, 0.7);
+  background: linear-gradient(to bottom, $primary-color-red, darken($primary-color-red, 10%));
+  box-shadow: 0px 0px 10px rgba($primary-color-red, 0.8);
 }
 
 .channel-up:hover, .channel-down:hover {
-  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 20%));
-  box-shadow: 0px 0px 12px rgba($primary-color-yellow, 1);
+  background: linear-gradient(to bottom, $primary-color-red, darken($primary-color-red, 20%));
+  box-shadow: 0px 0px 18px rgba($primary-color-red, 1);
 }
 
 /* Mute Button */
 .mute-btn {
-  background: linear-gradient(to bottom, #ff9933, #cc6600);
-  box-shadow: 0px 0px 5px rgba(255, 153, 51, 0.7);
+  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 10%));
+  box-shadow: 0px 0px 10px rgba($primary-color-yellow, 0.8);
 }
 
 .mute-btn:hover {
-  background: linear-gradient(to bottom, #ff9933, #993300);
-  box-shadow: 0px 0px 12px rgba(255, 153, 51, 1);
+  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 20%));
+  box-shadow: 0px 0px 18px rgba($primary-color-yellow, 1);
 }
 
 /* Fullscreen Button */
 .fullscreen-btn {
-  background: linear-gradient(to bottom, #66ff66, #339933);
-  box-shadow: 0px 0px 5px rgba(102, 255, 102, 0.7);
+  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 10%));
+  box-shadow: 0px 0px 10px rgba($primary-color-yellow, 0.8);
 }
 
 .fullscreen-btn:hover {
-  background: linear-gradient(to bottom, #66ff66, #1a661a);
-  box-shadow: 0px 0px 12px rgba(102, 255, 102, 1);
+  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 20%));
+  box-shadow: 0px 0px 18px rgba($primary-color-yellow, 1);
 }

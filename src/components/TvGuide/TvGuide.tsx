@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import "./TvGuide.scss";
 
 interface TvGuideProps {
@@ -7,11 +7,29 @@ interface TvGuideProps {
 }
 
 const TvGuide: React.FC<TvGuideProps> = ({ isOpen, closeGuide }) => {
+  const guideRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (guideRef.current && !guideRef.current.contains(event.target as Node)) {
+        closeGuide();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, closeGuide]);
+
   if (!isOpen) return null;
 
   return (
     <div className="tv-guide-overlay">
-      <div className="tv-guide-content">
+      <div className="tv-guide-content" ref={guideRef}>
         <button className="close-btn" onClick={closeGuide}>X</button>
         <h2>TV Guide</h2>
         <ul>

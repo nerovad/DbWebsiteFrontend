@@ -1,9 +1,6 @@
-$primary-color-yellow: #EAA612;
-$primary-color-red: #C1272D;
-$input-bg-color: #141115;
-$input-border-color: #262626;
+@use "../../styles/_variables.scss" as *;
 
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 .tv-guide-overlay {
   position: fixed;
@@ -17,7 +14,7 @@ $input-border-color: #262626;
   justify-content: center;
   align-items: center;
   z-index: 10001;
-  font-family: "Press Start 2P", sans-serif;
+  font-family: $primary-font-family;
   color: $primary-color-yellow; 
   text-shadow: 2px 2px 5px rgba(234, 166, 18, 0.2);
 
@@ -25,7 +22,7 @@ $input-border-color: #262626;
     width: 80%;
     max-width: 600px;
     background: linear-gradient(to bottom, $input-bg-color, darken($input-bg-color, 10%));
-    border: 4px solid $primary-color-red; // ✅ Uses red for a bold outline
+    border: 2px solid $primary-color-red-hover; // Uses red for a bold outline
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(193, 39, 45, 0.8); // ✅ Red neon glow effect
     padding: 20px;
@@ -42,7 +39,7 @@ $input-border-color: #262626;
       background: repeating-linear-gradient(
         rgba(234, 166, 18, 0.08) 0px,
         rgba(234, 166, 18, 0.02) 3px
-      ); // ✅ Subtle scanline effect using yellow
+      ); // Subtle scanline effect using yellow
       pointer-events: none;
     }
   }
@@ -76,6 +73,7 @@ $input-border-color: #262626;
 
   .close-btn {
     position: absolute;
+    width: 10%;
     top: 10px;
     right: 10px;
     background: $input-bg-color;
@@ -89,7 +87,7 @@ $input-border-color: #262626;
     transition: background 0.3s;
 
     &:hover {
-      background: rgba(255, 0, 0, 1);
+      background: $primary-color-yellow-hover;
     }
   }
 }

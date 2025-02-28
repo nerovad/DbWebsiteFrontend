@@ -27,7 +27,7 @@ const FloatingRemote: React.FC<FloatingRemoteProps> = ({
         <button className="close-btn" onClick={() => {
           console.log("Closing Remote");
           setIsRemoteOpen(false);
-        }}>❌</button>
+        }}>X</button>
 
         <button className="channel-up" onClick={() => {
           console.log("goToNextVideo() called");
