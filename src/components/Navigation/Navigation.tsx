@@ -47,7 +47,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn, setIsR
         </a>
 
 
-        <a href="#" className="search-navbar__link" onClick={() => setIsRemoteOpen(prev => !prev)}>
+        <a href="#" id="remote-button" className="search-navbar__link" onClick={() => setIsRemoteOpen(prev => !prev)}>
           <img src={RemoteIcon} alt="Remote" />
         </a>
 

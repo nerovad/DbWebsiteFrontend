@@ -24,15 +24,18 @@ const FloatingRemote: React.FC<FloatingRemoteProps> = ({
   return (
     <Draggable>
       <div className="floating-remote">
-        <button className="close-btn" onClick={() => {
+        <button className="close-btn-remote" onClick={() => {
           console.log("Closing Remote");
           setIsRemoteOpen(false);
         }}>X</button>
 
-        <button className="channel-up" onClick={() => {
+
+        <button className="channel-up" onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+          console.log("Button clicked:", event.target);
           console.log("goToNextVideo() called");
-          goToNextVideo(); // ✅ Ensure it's actually called
+          goToNextVideo();
         }}>Ch+</button>
+
 
         <button className="channel-down" onClick={() => {
           console.log("goToPreviousVideo() called");

@@ -22,9 +22,9 @@
     width: 80%;
     max-width: 600px;
     background: linear-gradient(to bottom, $input-bg-color, darken($input-bg-color, 10%));
-    border: 2px solid $primary-color-red-hover; // Uses red for a bold outline
+    border: 2px solid $input-border-color; 
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(193, 39, 45, 0.8); // ✅ Red neon glow effect
+    box-shadow: 0 0 10px rgba($primary-color-red, 0.6); 
     padding: 20px;
     text-align: center;
     position: relative;
@@ -66,7 +66,7 @@
       color: white;
 
       &:hover {
-        background: rgba(193, 39, 45, 0.5);
+        background: $primary-color-red;
       }
     }
   }

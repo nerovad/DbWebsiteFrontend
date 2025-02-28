@@ -11,7 +11,14 @@ const TvGuide: React.FC<TvGuideProps> = ({ isOpen, closeGuide }) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (guideRef.current && !guideRef.current.contains(event.target as Node)) {
+      const remoteButton = document.getElementById("remote-button"); // Adjust based on your actual ID or class
+
+      if (
+        guideRef.current &&
+        !guideRef.current.contains(event.target as Node) &&
+        remoteButton &&
+        !remoteButton.contains(event.target as Node) // Prevent closing if clicking the remote button
+      ) {
         closeGuide();
       }
     };
