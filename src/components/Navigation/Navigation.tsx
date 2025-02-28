@@ -10,9 +10,9 @@ import "./Navigation.scss";
 interface NavBarProps {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsRemoteOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
+const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn, setIsRemoteOpen }) => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -44,9 +44,11 @@ const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn }) => {
         <a href="/" className="search-navbar__link">
           <img src={HomeIcon} alt="Home" />
         </a>
-        <a href="/" className="search-navbar__link">
+
+        <a href="#" className="search-navbar__link" onClick={() => setIsRemoteOpen(prev => !prev)}>
           <img src={RemoteIcon} alt="Remote" />
         </a>
+
         <a href="/" className="search-navbar__link">
           <img src={TvGuideIcon} alt="TV Guide" />
         </a>

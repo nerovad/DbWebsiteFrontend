@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import "./VideoPlayer.scss";
+import FloatingRemote from "../FloatingRemote/FloatingRemote";
+import TvGuide from "../TvGuide/TvGuide";
 import Chatbox from "../Chatbox/Chatbox";
 import "../../styles/_variables.scss";
 import { useChatStore } from "../../store/useChatStore";
@@ -13,9 +15,11 @@ interface VideoPlayerProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsInstance = useRef<Hls | null>(null);
-  const { channelId, setChannelId } = useChatStore(); // ✅ Zustand state
+  const { channelId, setChannelId } = useChatStore(); // Zustand state
   const [currentIndex, setCurrentIndex] = useState(0);
   const [channelName, setChannelName] = useState("");
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+  const [isRemoteOpen, setIsRemoteOpen] = useState(false);
 
   // ✅ Video Sources
   const videoLinks = [
@@ -68,10 +72,37 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
   };
 
 
-  // ✅ Go to Next Video
+  const goToPreviousVideo = () => {
+    const prevIndex = (currentIndex - 1 + videoLinks.length) % videoLinks.length;
+    setCurrentIndex(prevIndex);
+    loadVideo(videoLinks[prevIndex].src);
+    setChannelName(videoLinks[prevIndex].channel);
+
+    // Update chat room ID
+    const newChannelId = `channel-${prevIndex}`;
+    setChannelId(newChannelId);
+    setTimeout(() => setChannelName(""), 7000);
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (videoRef.current) {
+      if (!document.fullscreenElement) {
+        videoRef.current.requestFullscreen().catch(err => console.error("Fullscreen failed:", err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  };
+  // Go to Next Video
 
   const goToNextVideo = () => {
-    console.log("goToNextVideo() triggered!"); // ✅ Debugging
+    console.log("goToNextVideo() triggered!"); // Debugging
     const nextIndex = (currentIndex + 1) % videoLinks.length;
     setCurrentIndex(nextIndex);
     loadVideo(videoLinks[nextIndex].src);
@@ -113,6 +144,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
           <div className="channelnumber">{channelName}</div>
         </div>
       </div>
+
+
+      {/* Floating Remote */}
+      <FloatingRemote
+        isRemoteOpen={isRemoteOpen}
+        setIsRemoteOpen={setIsRemoteOpen}
+        goToNextVideo={goToNextVideo}
+        goToPreviousVideo={goToPreviousVideo}
+        toggleMute={toggleMute}
+        toggleFullscreen={toggleFullscreen}
+        openGuide={() => setIsGuideOpen(true)}
+      />
+
+      {/* TV Guide (conditionally rendered) */}
+      {isGuideOpen && (
+        <TvGuide isOpen={isGuideOpen} closeGuide={() => setIsGuideOpen(false)} />
+      )}
 
       <Chatbox isOpen={isChatOpen} setIsOpen={() => { }} />
     </div>

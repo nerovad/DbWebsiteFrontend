@@ -1,27 +1,69 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
 .tv-guide-overlay {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: black;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  color: white;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6); // ✅ Semi-transparent black for overlay
+  backdrop-filter: blur(5px); // ✅ Adds modern blur effect
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 10001;
+  font-family: "Press Start 2P", sans-serif;
+  color: #00ffcc; // ✅ Classic CRT Green
+  text-shadow: 2px 2px 5px rgba(0, 255, 204, 0.8); // ✅ Neon glow effect
+
+  .tv-guide-content {
+    width: 80%;
+    max-width: 600px;
+    background: linear-gradient(to bottom, #222, #111);
+    border: 4px solid #00ffcc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.8);
+    padding: 20px;
+    text-align: center;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        rgba(0, 255, 204, 0.08) 0px,
+        rgba(0, 255, 204, 0.02) 3px
+      ); // ✅ Subtle scanline effect
+      pointer-events: none;
+    }
+  }
 
   h2 {
+    font-size: 22px;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
   }
 
   ul {
     list-style: none;
     padding: 0;
+    text-align: left;
 
     li {
-      padding: 5px 0;
-      font-size: 18px;
+      background: rgba(0, 255, 204, 0.2);
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background 0.3s;
+
+      &:hover {
+        background: rgba(0, 255, 204, 0.5);
+      }
     }
   }
 
@@ -29,11 +71,18 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    background: red;
+    background: rgba(255, 0, 0, 0.8);
     border: none;
     color: white;
-    padding: 5px;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background 0.3s;
+
+    &:hover {
+      background: rgba(255, 0, 0, 1);
+    }
   }
 }
-
