@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaSearch, FaUserCircle } from "react-icons/fa";
 import Logo from "../../assets/J0013_DAIN_BRAMAGE_LOGO_V01.svg";
-import HomeIcon from "../../assets/DBwebsiteIconDBTV.svg";
+import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import RemoteIcon from "../../assets/DB_Remote.svg";
-import TvGuideIcon from "../../assets/DBwebsiteIconOpenSource.svg";
 import "./Navigation.scss";
 
 interface NavBarProps {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   setIsRemoteOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsGuideOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn, setIsRemoteOpen }) => {
+const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn, setIsRemoteOpen, setIsGuideOpen }) => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -41,16 +41,14 @@ const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn, setIsR
 
       {/* Right Links & Profile/Login */}
       <div className="search-navbar__links">
-        <a href="/" className="search-navbar__link">
-          <img src={HomeIcon} alt="Home" />
+
+        <a href="#" className="search-navbar__link" onClick={() => setIsGuideOpen?.(prev => !prev)}>
+          <img src={TvGuideIcon} alt="TV Guide" />
         </a>
+
 
         <a href="#" className="search-navbar__link" onClick={() => setIsRemoteOpen(prev => !prev)}>
           <img src={RemoteIcon} alt="Remote" />
-        </a>
-
-        <a href="/" className="search-navbar__link">
-          <img src={TvGuideIcon} alt="TV Guide" />
         </a>
 
         {/* Show Login button if NOT logged in */}

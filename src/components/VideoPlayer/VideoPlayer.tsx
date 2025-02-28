@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import "./VideoPlayer.scss";
 import FloatingRemote from "../FloatingRemote/FloatingRemote";
-import TvGuide from "../TvGuide/TvGuide";
 import Chatbox from "../Chatbox/Chatbox";
 import "../../styles/_variables.scss";
 import { useChatStore } from "../../store/useChatStore";
@@ -18,7 +17,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
   const { channelId, setChannelId } = useChatStore(); // Zustand state
   const [currentIndex, setCurrentIndex] = useState(0);
   const [channelName, setChannelName] = useState("");
-  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isRemoteOpen, setIsRemoteOpen] = useState(false);
 
   // ✅ Video Sources
@@ -154,13 +152,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
         goToPreviousVideo={goToPreviousVideo}
         toggleMute={toggleMute}
         toggleFullscreen={toggleFullscreen}
-        openGuide={() => setIsGuideOpen(true)}
       />
-
-      {/* TV Guide (conditionally rendered) */}
-      {isGuideOpen && (
-        <TvGuide isOpen={isGuideOpen} closeGuide={() => setIsGuideOpen(false)} />
-      )}
 
       <Chatbox isOpen={isChatOpen} setIsOpen={() => { }} />
     </div>

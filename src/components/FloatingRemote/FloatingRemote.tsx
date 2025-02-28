@@ -9,7 +9,6 @@ interface FloatingRemoteProps {
   goToPreviousVideo: () => void;
   toggleMute: () => void;
   toggleFullscreen: () => void;
-  openGuide: () => void;
 }
 
 const FloatingRemote: React.FC<FloatingRemoteProps> = ({
@@ -19,42 +18,37 @@ const FloatingRemote: React.FC<FloatingRemoteProps> = ({
   goToPreviousVideo,
   toggleMute,
   toggleFullscreen,
-  openGuide
 }) => {
   if (!isRemoteOpen) return null; // ✅ Hide remote when it's closed
 
   return (
     <Draggable>
       <div className="floating-remote">
-        <button className="power-btn" onClick={() => {
-          console.log("❌ Closing Remote");
+        <button className="close-btn" onClick={() => {
+          console.log("Closing Remote");
           setIsRemoteOpen(false);
         }}>❌</button>
 
         <button className="channel-up" onClick={() => {
-          console.log("🔼 goToNextVideo() called");
+          console.log("goToNextVideo() called");
           goToNextVideo(); // ✅ Ensure it's actually called
         }}>Ch+</button>
 
         <button className="channel-down" onClick={() => {
-          console.log("🔽 goToPreviousVideo() called");
+          console.log("goToPreviousVideo() called");
           goToPreviousVideo();
         }}>Ch-</button>
 
         <button className="mute-btn" onClick={() => {
-          console.log("🔇 toggleMute() called");
+          console.log("toggleMute() called");
           toggleMute();
         }}>Mute</button>
 
         <button className="fullscreen-btn" onClick={() => {
-          console.log("⛶ toggleFullscreen() called");
+          console.log("toggleFullscreen() called");
           toggleFullscreen();
         }}>Full</button>
 
-        <button className="guide-btn" onClick={() => {
-          console.log("📺 openGuide() called");
-          openGuide();
-        }}>Guide</button>
       </div>
     </Draggable>
   );

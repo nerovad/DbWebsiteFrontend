@@ -92,6 +92,7 @@
   &__profile {
     position: relative;
     cursor: pointer;
+    margin-top: .3rem;
   }
 
   &__profile-icon {
@@ -148,7 +149,7 @@
     }
 
     &__logout {
-      background: red;
+      background: $primary-color-red;
       color: white;
       border: none;
       padding: 10px;

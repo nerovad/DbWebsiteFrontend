@@ -1,3 +1,7 @@
+$primary-color-yellow: #EAA612;
+$primary-color-red: #C1272D;
+$input-bg-color: #141115;
+$input-border-color: #262626;
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
 
@@ -7,13 +11,13 @@
   right: 20px;
   width: 140px;
   padding: 15px;
-  background: linear-gradient(to bottom, #1b1b1b, #2a2a2a); /* Sleek dark gradient */
+  background: linear-gradient(to bottom, $input-bg-color, darken($input-bg-color, 10%)); // ✅ Sleek dark gradient
   border-radius: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.3); /* Subtle neon glow */
-  border: 2px solid rgba(0, 255, 255, 0.5);
+  box-shadow: 0px 0px 10px rgba($primary-color-yellow, 0.3); // ✅ Subtle neon glow
+  border: 2px solid rgba($primary-color-yellow, 0.5);
   z-index: 10005;
   pointer-events: auto;
   font-family: 'Orbitron', sans-serif;
@@ -22,7 +26,7 @@
 }
 
 /* Buttons with Neon Glow */
-.power-btn, .channel-up, .channel-down, .mute-btn, .fullscreen-btn, .guide-btn {
+.close-btn, .channel-up, .channel-down, .mute-btn, .fullscreen-btn {
   width: 100px;
   height: 40px;
   border-radius: 8px;
@@ -34,15 +38,15 @@
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   background: black;
-  box-shadow: 0px 0px 5px rgba(0, 255, 255, 0.4);
+  box-shadow: 0px 0px 5px rgba($primary-color-yellow, 0.4);
   color: white;
   font-family: inherit;
   letter-spacing: 1px;
-  text-shadow: 0px 0px 5px rgba(0, 255, 255, 0.7);
+  text-shadow: 0px 0px 5px rgba($primary-color-yellow, 0.7);
 
   &:hover {
-    background: rgba(0, 255, 255, 0.2);
-    box-shadow: 0px 0px 12px rgba(0, 255, 255, 0.9);
+    background: rgba($primary-color-yellow, 0.2);
+    box-shadow: 0px 0px 12px rgba($primary-color-yellow, 0.9);
   }
 
   &:active {
@@ -50,15 +54,27 @@
   }
 }
 
+/* Power Button */
+.close-btn {
+  background: $primary-color-red;
+  box-shadow: 0px 0px 8px rgba($primary-color-red, 0.7);
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    background: darken($primary-color-red, 10%);
+    box-shadow: 0px 0px 15px rgba($primary-color-red, 1);
+  }
+}
+
 /* Channel Buttons */
 .channel-up, .channel-down {
-  background: linear-gradient(to bottom, #00ffcc, #009999);
-  box-shadow: 0px 0px 5px rgba(0, 255, 204, 0.7);
+  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 10%));
+  box-shadow: 0px 0px 5px rgba($primary-color-yellow, 0.7);
 }
 
 .channel-up:hover, .channel-down:hover {
-  background: linear-gradient(to bottom, #00ffcc, #006666);
-  box-shadow: 0px 0px 12px rgba(0, 255, 204, 1);
+  background: linear-gradient(to bottom, $primary-color-yellow, darken($primary-color-yellow, 20%));
+  box-shadow: 0px 0px 12px rgba($primary-color-yellow, 1);
 }
 
 /* Mute Button */
@@ -81,15 +97,4 @@
 .fullscreen-btn:hover {
   background: linear-gradient(to bottom, #66ff66, #1a661a);
   box-shadow: 0px 0px 12px rgba(102, 255, 102, 1);
-}
-
-/* Guide Button */
-.guide-btn {
-  background: linear-gradient(to bottom, #9966ff, #663399);
-  box-shadow: 0px 0px 5px rgba(153, 102, 255, 0.7);
-}
-
-.guide-btn:hover {
-  background: linear-gradient(to bottom, #9966ff, #4d2673);
-  box-shadow: 0px 0px 12px rgba(153, 102, 255, 1);
 }
