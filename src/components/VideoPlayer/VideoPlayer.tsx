@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 import "./VideoPlayer.scss";
-import FloatingRemote from "../FloatingRemote/FloatingRemote";
 import Chatbox from "../Chatbox/Chatbox";
 import "../../styles/_variables.scss";
+import muteIcon from "../../assets/Mute.svg";
 import { useChatStore } from "../../store/useChatStore";
 
 interface VideoPlayerProps {
@@ -28,7 +28,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
   const { channelId, setChannelId } = useChatStore(); // Zustand state
   const [currentIndex, setCurrentIndex] = useState(0);
   const [channelName, setChannelName] = useState("");
-  const [isRemoteOpen, setIsRemoteOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // Video starts muted
+  const [showMuteIcon, setShowMuteIcon] = useState(false);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      const muted = !videoRef.current.muted;
+      videoRef.current.muted = muted;
+      setIsMuted(muted);
+      setShowMuteIcon(true);
+
+      if (!muted) {
+        // If unmuted, hide the icon immediately
+        setTimeout(() => setShowMuteIcon(false), 200);
+      }
+    }
+  };
+
+  // ✅ Show mute icon on first load if muted
+  useEffect(() => {
+    if (videoRef.current?.muted) {
+      setShowMuteIcon(true);
+      setTimeout(() => setShowMuteIcon(false), 1500); // Hide after 1.5s
+    }
+  }, []);
 
   // ✅ Video Sources
   const videoLinks = [
@@ -91,11 +114,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
     setTimeout(() => setChannelName(""), 7000);
   };
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-    }
-  };
 
   const toggleFullscreen = () => {
     if (videoRef.current) {
@@ -219,17 +237,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
         </div>
       </div>
 
-      {/* Floating Remote */}
-      <FloatingRemote
-        isRemoteOpen={isRemoteOpen}
-        setIsRemoteOpen={setIsRemoteOpen}
-        goToNextVideo={goToNextVideo}
-        goToPreviousVideo={goToPreviousVideo}
-        toggleMute={toggleMute}
-        toggleFullscreen={toggleFullscreen}
-      />
-
       <Chatbox isOpen={isChatOpen} setIsOpen={() => { }} />
+
+      {showMuteIcon && (
+        <img src={muteIcon} alt="Muted" className="mute-icon-overlay" />
+
+      )}
     </div>
   );
 };
