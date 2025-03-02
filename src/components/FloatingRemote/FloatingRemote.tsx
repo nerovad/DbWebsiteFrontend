@@ -29,7 +29,6 @@ const FloatingRemote: React.FC<FloatingRemoteProps> = ({
           setIsRemoteOpen(false);
         }}>X</button>
 
-
         <button className="channel-up" onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
           console.log("Button clicked:", event.target);
           console.log("goToNextVideo() called");

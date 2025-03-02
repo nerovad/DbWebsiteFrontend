@@ -1,25 +1,57 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaSearch, FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaVolumeMute, FaExpand } from "react-icons/fa";
 import Logo from "../../assets/J0013_DAIN_BRAMAGE_LOGO_V01.svg";
 import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
-import RemoteIcon from "../../assets/DB_Remote.svg";
 import "./Navigation.scss";
 
 interface NavBarProps {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsRemoteOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  currentIndex: number;
+  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+  videoLinks: { src: string; channel: string }[];
+  videoRef: React.RefObject<HTMLVideoElement>;
   setIsGuideOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+  goToNextVideo: () => void;
+  goToPreviousVideo: () => void;
+  toggleMute: () => void;
+  toggleFullscreen: () => void;
+  loadVideo: (src: string) => void;
 }
-const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn, setIsRemoteOpen, setIsGuideOpen }) => {
+
+const SearchNavBar: React.FC<NavBarProps> = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  currentIndex,
+  setCurrentIndex,
+  videoLinks,
+  videoRef,
+  setIsGuideOpen,
+  goToNextVideo,
+  goToPreviousVideo,
+  toggleMute,
+  toggleFullscreen,
+  loadVideo,
+}) => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [channelInput, setChannelInput] = useState("");
 
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove JWT
     setIsLoggedIn(false);
     navigate("/login"); // Redirect to login
+  };
+
+  const goToChannel = () => {
+    const channelNumber = parseInt(channelInput, 10);
+    if (!isNaN(channelNumber) && channelNumber >= 0 && channelNumber < videoLinks.length) {
+      setCurrentIndex(channelNumber);
+      loadVideo(videoLinks[channelNumber].src); // ✅ Load video on channel change
+    } else {
+      alert("Invalid channel number");
+    }
   };
 
   return (
@@ -31,24 +63,45 @@ const SearchNavBar: React.FC<NavBarProps> = ({ isLoggedIn, setIsLoggedIn, setIsR
         </a>
       </div>
 
-      {/* Center Search Bar */}
+      {/* Center Controls */}
       <div className="search-navbar__center">
-        <div className="search-navbar__search">
-          <FaSearch className="search-navbar__icon" size={24} />
-          <input type="text" placeholder="Search" className="search-navbar__input" />
+        <button className="channel-button" onClick={goToPreviousVideo}>
+          Ch-
+        </button>
+
+        <div className="search-navbar__channel-input-container">
+          <input
+            type="text"
+            value={channelInput}
+            onChange={(e) => setChannelInput(e.target.value)}
+            placeholder={`Ch: ${currentIndex}`}
+            className="channel-input"
+            onKeyDown={(e) => e.key === "Enter" && goToChannel()}
+          />
+          <button className="channel-go-button" onClick={goToChannel}>
+            Go
+          </button>
         </div>
+
+        <button className="channel-button" onClick={goToNextVideo}>
+          Ch+
+        </button>
+
+        {/* Mute Button */}
+        <button className="mute-button" onClick={toggleMute}>
+          <FaVolumeMute size={20} />
+        </button>
+
+        {/* Fullscreen Button */}
+        <button className="fullscreen-button" onClick={toggleFullscreen}>
+          <FaExpand size={20} />
+        </button>
       </div>
 
       {/* Right Links & Profile/Login */}
       <div className="search-navbar__links">
-
-        <a href="#" className="search-navbar__link" onClick={() => setIsGuideOpen?.(prev => !prev)}>
+        <a href="#" className="search-navbar__link" onClick={() => setIsGuideOpen?.((prev) => !prev)}>
           <img src={TvGuideIcon} alt="TV Guide" />
-        </a>
-
-
-        <a href="#" id="remote-button" className="search-navbar__link" onClick={() => setIsRemoteOpen(prev => !prev)}>
-          <img src={RemoteIcon} alt="Remote" />
         </a>
 
         {/* Show Login button if NOT logged in */}

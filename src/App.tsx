@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/Navigation/Navigation.tsx";
 import FloatingRemote from "./components/FloatingRemote/FloatingRemote";
 import NewsTicker from "./components/NewsTicker/NewsTicker.tsx";
-import TvGuide from "./components/TvGuide/TvGuide.tsx"
+import TvGuide from "./components/TvGuide/TvGuide.tsx";
 import VideoPlayer from "./components/VideoPlayer/VideoPlayer.tsx";
 import Channels from "./components/Channels/Channels.tsx";
 import Chatbox from "./components/Chatbox/Chatbox.tsx";
@@ -22,38 +22,53 @@ const MainLayout: React.FC<{
   setIsGuideOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ isMenuOpen, isChatOpen, setIsMenuOpen, setIsChatOpen, isRemoteOpen, setIsRemoteOpen, isGuideOpen, setIsGuideOpen, isLoggedIn, setIsLoggedIn }) => (
-  <>
-    <NavBar
-      isLoggedIn={isLoggedIn}
-      setIsLoggedIn={setIsLoggedIn}
-      setIsRemoteOpen={setIsRemoteOpen}
-      setIsGuideOpen={setIsGuideOpen}
-    />
-    <div className="main-content">
-      <Channels isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
-
-      <VideoPlayer
-        isMenuOpen={isMenuOpen}
-        isChatOpen={isChatOpen}
+  videoControls: any; // ✅ Added video controls prop
+}> = ({
+  isMenuOpen,
+  isChatOpen,
+  setIsMenuOpen,
+  setIsChatOpen,
+  isRemoteOpen,
+  setIsRemoteOpen,
+  isGuideOpen,
+  setIsGuideOpen,
+  isLoggedIn,
+  setIsLoggedIn,
+  videoControls, // ✅ Receive video controls
+}) => (
+    <>
+      <NavBar
+        isLoggedIn={isLoggedIn}
+        setIsLoggedIn={setIsLoggedIn}
+        setIsRemoteOpen={setIsRemoteOpen}
         setIsGuideOpen={setIsGuideOpen}
+        {...videoControls} // ✅ Pass video controls to NavBar
       />
-      <Chatbox isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
-    </div>
-    <NewsTicker />
+      <div className="main-content">
+        <Channels isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
 
-    {isGuideOpen && <TvGuide isOpen={isGuideOpen} closeGuide={() => setIsGuideOpen(false)} />}
+        <VideoPlayer
+          isMenuOpen={isMenuOpen}
+          isChatOpen={isChatOpen}
+          setIsGuideOpen={setIsGuideOpen}
+          setVideoControls={videoControls.setVideoControls}
+        />
+        <Chatbox isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
+      </div>
+      <NewsTicker />
 
-    <FloatingRemote
-      isRemoteOpen={isRemoteOpen}
-      setIsRemoteOpen={setIsRemoteOpen}
-      goToNextVideo={() => console.log("Next Video")}
-      goToPreviousVideo={() => console.log("Previous Video")}
-      toggleMute={() => console.log("Mute")}
-      toggleFullscreen={() => console.log("Fullscreen")}
-    />
-  </>
-);
+      {isGuideOpen && <TvGuide isOpen={isGuideOpen} closeGuide={() => setIsGuideOpen(false)} />}
+
+      <FloatingRemote
+        isRemoteOpen={isRemoteOpen}
+        setIsRemoteOpen={setIsRemoteOpen}
+        goToNextVideo={videoControls.goToNextVideo} // ✅ Use real functions
+        goToPreviousVideo={videoControls.goToPreviousVideo}
+        toggleMute={videoControls.toggleMute}
+        toggleFullscreen={videoControls.toggleFullscreen}
+      />
+    </>
+  );
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
@@ -61,6 +76,22 @@ const App: React.FC = () => {
   const [isRemoteOpen, setIsRemoteOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
+  // ✅ Video State (Received from VideoPlayer.tsx)
+
+  const [videoControls, setVideoControls] = useState<any>({
+    currentIndex: 0,
+    setCurrentIndex: () => { },
+    videoLinks: [],
+    videoRef: null,
+    goToNextVideo: () => { },
+    goToPreviousVideo: () => { },
+    toggleMute: () => { },
+    toggleFullscreen: () => { },
+    loadVideo: () => { },
+    setVideoControls: (controls: any) => setVideoControls((prev) => ({ ...prev, ...controls })), // ✅ Persist state updates
+  });
+
 
   // ✅ Listen for changes in localStorage
   useEffect(() => {
@@ -91,6 +122,7 @@ const App: React.FC = () => {
               setIsGuideOpen={setIsGuideOpen}
               isLoggedIn={isLoggedIn}
               setIsLoggedIn={setIsLoggedIn}
+              videoControls={videoControls} // ✅ Pass video controls to MainLayout
             />
           }
         />
@@ -104,4 +136,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-

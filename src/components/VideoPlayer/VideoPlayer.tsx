@@ -9,9 +9,20 @@ import { useChatStore } from "../../store/useChatStore";
 interface VideoPlayerProps {
   isMenuOpen: boolean;
   isChatOpen: boolean;
+  setVideoControls: (controls: {
+    currentIndex: number;
+    setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
+    videoLinks: { src: string; channel: string }[];
+    videoRef: React.RefObject<HTMLVideoElement>;
+    goToNextVideo: () => void;
+    goToPreviousVideo: () => void;
+    toggleMute: () => void;
+    toggleFullscreen: () => void;
+    loadVideo: (src: string) => void;
+  }) => void;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVideoControls }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsInstance = useRef<Hls | null>(null);
   const { channelId, setChannelId } = useChatStore(); // Zustand state
@@ -28,7 +39,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     { src: "https://dainbramage.tv:8088/channel31/channel31.m3u8", channel: "channel-4" }
   ];
 
-
   const getClassNames = () => {
     let classNames = "";
 
@@ -41,7 +51,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
 
   // ✅ Load Video Function
   const loadVideo = (src: string) => {
-    console.log(` Loading video: ${src}`); // ✅ Debugging log
+    console.log(`Loading video: ${src}`); // ✅ Debugging log
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
@@ -56,19 +66,18 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
       hls.loadSource(src);
       hls.attachMedia(videoElement);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        videoElement.play().catch(() => console.error(" AutoPlay failed!"));
+        videoElement.play().catch(() => console.error("AutoPlay failed!"));
       });
       hlsInstance.current = hls;
     } else if (src.endsWith(".mp4")) {
       console.log("MP4 file detected, using native player");
       videoElement.src = src;
       videoElement.load();
-      videoElement.play().catch(() => console.error(" AutoPlay failed!"));
+      videoElement.play().catch(() => console.error("AutoPlay failed!"));
     } else {
       console.error("Invalid video format: ", src);
     }
   };
-
 
   const goToPreviousVideo = () => {
     const prevIndex = (currentIndex - 1 + videoLinks.length) % videoLinks.length;
@@ -97,7 +106,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
       }
     }
   };
-  // Go to Next Video
 
   const goToNextVideo = () => {
     console.log("goToNextVideo() triggered!"); // Debugging
@@ -123,6 +131,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
     loadVideo(videoLinks[currentIndex].src);
   }, [currentIndex]);
 
+  // ✅ Send Video Controls to App.tsx
+
+  useEffect(() => {
+    if (typeof setVideoControls === "function") {
+      setVideoControls({
+        currentIndex,
+        setCurrentIndex,
+        videoLinks,
+        videoRef,
+        goToNextVideo,
+        goToPreviousVideo,
+        toggleMute,
+        toggleFullscreen,
+        loadVideo,
+      });
+    } else {
+      console.error("setVideoControls is not a function yet!");
+    }
+  }, [currentIndex]);
+
 
   return (
     <div className={`video-container-dboriginals ${getClassNames()}`}>
@@ -143,7 +171,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
         </div>
       </div>
 
-
       {/* Floating Remote */}
       <FloatingRemote
         isRemoteOpen={isRemoteOpen}
@@ -157,8 +184,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen }) => 
       <Chatbox isOpen={isChatOpen} setIsOpen={() => { }} />
     </div>
   );
-
 };
 
 export default VideoPlayer;
-
