@@ -151,6 +151,54 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
     }
   }, [currentIndex]);
 
+  useEffect(() => {
+    const handleRightClick = (event: MouseEvent) => {
+      event.preventDefault(); // Disable default right-click menu
+      goToPreviousVideo(); // Go to previous channel
+    };
+
+    document.addEventListener("contextmenu", handleRightClick);
+
+    return () => {
+      document.removeEventListener("contextmenu", handleRightClick);
+    };
+  }, [currentIndex]); // Re-run when `currentIndex` changes
+
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const activeElement = document.activeElement as HTMLElement;
+
+      // Prevent shortcuts if typing in an input field
+      if (activeElement && (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA" || activeElement.getAttribute("contenteditable") === "true")) {
+        return;
+      }
+
+      switch (event.key.toLowerCase()) {
+        case "m": // Mute/Unmute
+          toggleMute();
+          break;
+        case "f": // Fullscreen
+          toggleFullscreen();
+          break;
+        case "arrowdown": // Previous channel
+          goToPreviousVideo();
+          break;
+        case "arrowup": // Next channel
+          goToNextVideo();
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [currentIndex]);
+
 
   return (
     <div className={`video-container-dboriginals ${getClassNames()}`}>
