@@ -33,6 +33,8 @@ const SearchNavBar: React.FC<NavBarProps> = ({
   toggleMute,
   toggleFullscreen,
   loadVideo,
+  setIsAuthOpen,
+  setAuthMode,
 }) => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
@@ -41,7 +43,6 @@ const SearchNavBar: React.FC<NavBarProps> = ({
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove JWT
     setIsLoggedIn(false);
-    navigate("/login"); // Redirect to login
   };
 
   const goToChannel = () => {
@@ -104,11 +105,13 @@ const SearchNavBar: React.FC<NavBarProps> = ({
           <img src={TvGuideIcon} alt="TV Guide" />
         </a>
 
-        {/* Show Login button if NOT logged in */}
+        {/* ✅ Update Login Button to Open Auth Modal Instead */}
         {!isLoggedIn ? (
-          <Link to="/login" className="search-navbar__login-button">
-            Login
-          </Link>
+          <>
+            <button onClick={() => { setAuthMode("login"); setIsAuthOpen(true); }} className="search-navbar__login-button">
+              Login
+            </button>
+          </>
         ) : (
           // Show Profile icon if logged in
           <div className="search-navbar__profile" onClick={() => setShowDropdown(!showDropdown)}>

@@ -1,6 +1,6 @@
 @use "../../styles/_variables.scss" as *;
 
-.trending-container {
+.utilities-container {
   position: fixed;
   font-family: $primary-font-family;
   top: 50px; 
@@ -13,7 +13,7 @@
   z-index: 1000;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
   min-width: 30px;
-  
+
   &.open {
     width: 250px;
   }
@@ -50,7 +50,7 @@
   }
 }
 
-.trending-channels {
+.utilities-menu {
   font-family: inherit;
   padding: 0rem 1rem;
   background-color: $input-bg-color;
@@ -58,7 +58,7 @@
   opacity: 0;
   transform: translateX(-10px);
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  
+
   &.open {
     display: flex;
     flex-direction: column;
@@ -72,6 +72,7 @@
     margin-bottom: 1rem;
     font-weight: bold;
     margin-top: 2rem;
+    text-align: center;
   }
 
   ul {
@@ -84,11 +85,26 @@
     font-size: 0.875rem;
     font-family: inherit;
     margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+    cursor: pointer;
 
-    h4 {
-      font-family: inherit;
-      font-size: 0.75rem;
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    strong {
+      font-size: 1rem;
       color: $primary-color-red;
+    }
+
+    p {
+      font-size: 0.75rem;
+      color: #ddd;
+      margin-top: 2px;
     }
   }
 }

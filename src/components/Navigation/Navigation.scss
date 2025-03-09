@@ -163,8 +163,10 @@
   // Login Button (Only visible when not logged in)
   &__login-button {
     background-color: $primary-color-red;
+    border: none;
+    cursor: pointer;
     color: $channel-text-color;
-    padding: 4px 8px;
+    padding: 6px 8px;
     border-radius: 5px;
     text-decoration: none;
     transition: background 0.3s ease-in-out;

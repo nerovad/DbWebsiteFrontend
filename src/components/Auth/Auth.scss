@@ -1,21 +1,46 @@
 @use "../../styles/_variables.scss" as *;
 
+.auth-overlay {
+  position: fixed; /* ✅ Ensure it covers the entire screen */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6); /* ✅ Semi-transparent background */
+  backdrop-filter: blur(5px); /* ✅ Blur effect */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001; /* ✅ Ensure it appears above other elements */
+
+  .auth-card {
+    background: #1a1a1a;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    width: 350px;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
 .auth-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh; /* Full page height */
+  height: 100vh;
   background-color: $input-bg-color;
-}
-
-.auth-card {
-  background: #1a1a1a; /* Dark background */
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-  text-align: center;
-  width: 350px;
 }
 
 .auth-card h2 {
@@ -52,12 +77,19 @@
   background: darken($primary-color-red, 10%);
 }
 
-.auth-card a {
-  color: #ff5757;
-  text-decoration: none;
+.auth-card p {
+  margin-top: 1rem;
+  color: #ddd;
 }
 
-.auth-card a:hover {
+.auth-card span {
+  color: $primary-color-red;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-card span:hover {
   text-decoration: underline;
+}
 }
 
