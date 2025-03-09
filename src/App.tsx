@@ -7,6 +7,9 @@ import VideoPlayer from "./components/VideoPlayer/VideoPlayer.tsx";
 import Channels from "./components/Menu/Menu.tsx";
 import Chatbox from "./components/Chatbox/Chatbox.tsx";
 import Auth from "./components/Auth/Auth.tsx";
+import Settings from "./components/Settings/Settings.tsx";
+import Upload from "./components/Upload/Upload.tsx";
+import Profile from "./components/Profile/Profile.tsx";
 import "./App.scss";
 
 
@@ -128,6 +131,11 @@ const App: React.FC = () => {
             />
           }
         />
+        <Route path="/upload" element={<Upload />} />
+
+        <Route path="/settings" element={<Settings />} />
+
+        <Route path="/profile" element={<Profile />} />
       </Routes>
       {isAuthOpen && (
         <Auth

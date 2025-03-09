@@ -1,0 +1,37 @@
+@use "../../styles/_variables.scss" as *;
+
+.profile-page {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background: #222;
+  color: #fff;
+  border-radius: 10px;
+  text-align: center;
+
+  .profile-title {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+
+  .profile-section {
+    background: #333;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: left;
+
+    h2 {
+      font-size: 22px;
+      border-bottom: 2px solid #ff4500;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #ccc;
+    }
+  }
+}
+
