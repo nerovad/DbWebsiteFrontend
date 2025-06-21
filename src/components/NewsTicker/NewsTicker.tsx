@@ -7,7 +7,7 @@ const NewsTicker: React.FC = () => {
     <div className="news-ticker">
       <div className="ticker">
         <p>
-          Welcome to Dain Bramage TV
+          Welcome to CineZoo!
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           Click anywhere on screen to navigate channels
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

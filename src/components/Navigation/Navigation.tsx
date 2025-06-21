@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaVolumeMute, FaExpand } from "react-icons/fa";
-import Logo from "../../assets/J0013_DAIN_BRAMAGE_LOGO_V01.svg";
+import Logo from "../../assets/ChatGPT Image Jun 20, 2025, 05_58_07 PM.png";
 import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import "./Navigation.scss";
 
@@ -60,7 +60,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
       {/* Left Logo */}
       <div className="search-navbar__left">
         <a href="/">
-          <img src={Logo} alt="Dain Bramage TV" className="search-navbar__logo" />
+          <img src={Logo} alt="Cinezoo" className="search-navbar__logo" />
         </a>
       </div>
 
@@ -75,7 +75,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
             type="text"
             value={channelInput}
             onChange={(e) => setChannelInput(e.target.value)}
-            placeholder={`Ch: ${currentIndex}`}
+            placeholder={`${currentIndex}`}
             className="channel-input"
             onKeyDown={(e) => e.key === "Enter" && goToChannel()}
           />
