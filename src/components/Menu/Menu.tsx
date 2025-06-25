@@ -11,10 +11,10 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const utilities = [
-    { name: "Vote on Films", description: "Rate and support your favorite entries." },
-    { name: "Battle Royale Matchups", description: "Films go head-to-head. You decide the winner." },
+    { name: "Voting Ballot", description: "Rate and support your favorite entries." },
+    { name: "Battle Royale", description: "Films go head-to-head. You decide the winner." },
     { name: "Tournament Bracket", description: "See who’s advancing in the competition." },
-    { name: "Leaderboard & Challenges", description: "Top-ranked filmmakers and live contests." },
+    { name: "All Time Leaderboard", description: "Top-ranked filmmakers." },
   ];
 
   return (
@@ -25,7 +25,7 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
       </button>
 
       <div className={`utilities-menu ${isOpen ? "open" : ""}`}>
-        <h3>Festival Utilities</h3>
+        <h3>The Pit</h3>
         <ul>
           {utilities.map((utility, index) => (
             <li key={index}>
