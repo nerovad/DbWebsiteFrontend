@@ -1,33 +1,21 @@
 :root {
-  --primary-font: 'Inter', sans-serif;
+  --primary-font: 'Press Start 2P', monospace;
 }
 
-$primary-font-family: var(--primary-font);
-$news-ticker-font-family: var(--primary-font);
+$primary-font-family: var(--primary-font), sans-serif;
 
-$primary-border-color: rgb(193, 39, 45);
-$primary-color-red: #6e8141;
-$primary-color-red-hover: #AF4808;
-$primary-color-yellow: #EAA612;
-$primary-color-yellow-hover: #C98D10;
-$primary-color-alabaster: #F2ECE3;
-$primary-color-charcoal: #3A4454;
-$primary-color-paynesgray: #53687E;
-  
-$input-bg-color: #141115;
-$input-border-color: #262626;
-$placeholder-color: #9ca3af;
-$icon-hover-scale: 1.1;
+// 🌌 Backgrounds — smooth, rich, deep
+$background-color-primary: #0e0a1e;        // deep space purple-black
+$background-color-secondary: #2a2342;      // rich desaturated violet — clean, cool
+$border-color-primary: #1f1b2e;            // slightly lighter — subtle panel lines
 
-$news-ticker-bg-color: #141115;
-$news-ticker-text-color: #ADF7B6;
-$news-ticker-secondary-color: #cc6122;
-$news-ticker-font-size: 30px;
-$ticker-animation-speed: 20s;
+// 🔮 Accents — Neon Triad
+$primary-color: #a259ff;                  // arcane purple — hero actions
+$secondary-color: #3aff78;                // neon jungle green — success, active states
+$accent-secondary-color: #ff7b00;         // blazing orange — alerts, hover, emphasis
 
-$channel-font-size: 4.5vw;
-$channel-text-color: rgb(255, 255, 255);
-$video-bg-color: transparent;
-$video-full-size: 100%;
+// ✍️ Text — clean and intentional
+$text-color-primary: #e5e5e5;              // soft white-gray — general body copy
+$text-color-secondary: #b9b9d0;            // muted lilac-gray — secondary UI
+$channel-text-color: #ffffff;              // pure white — overlays & top-level info
 
-$cream: #f4ecdc;

@@ -1,17 +1,17 @@
 @use "../../styles/_variables.scss" as *;
 
 .auth-overlay {
-  position: fixed; /* ✅ Ensure it covers the entire screen */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6); /* ✅ Semi-transparent background */
-  backdrop-filter: blur(5px); /* ✅ Blur effect */
+  background: rgba(1, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10001; /* ✅ Ensure it appears above other elements */
+  z-index: 10001; 
 
   .auth-card {
     background: #1a1a1a;
@@ -40,7 +40,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: $input-bg-color;
+  background-color: $background-color-primary;
 }
 
 .auth-card h2 {
@@ -67,14 +67,14 @@
   padding: 10px;
   border: none;
   border-radius: 4px;
-  background: $primary-color-red;
+  background: $primary-color;
   color: white;
   cursor: pointer;
   font-weight: bold;
 }
 
 .auth-card button:hover {
-  background: darken($primary-color-red, 10%);
+  background: darken($primary-color, 10%);
 }
 
 .auth-card p {
@@ -83,7 +83,7 @@
 }
 
 .auth-card span {
-  color: $primary-color-red;
+  color: $primary-color;
   cursor: pointer;
   font-weight: bold;
 }

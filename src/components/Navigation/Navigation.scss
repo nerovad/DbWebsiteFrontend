@@ -7,7 +7,7 @@
   padding: 0.5rem 1rem;
   height: 50px;
   width: 100%;
-  background-color: $input-bg-color;
+  background-color: $background-color-primary;
   z-index: 100000;
   font-family: $primary-font-family;
 
@@ -22,7 +22,7 @@
       transition: transform 0.2s ease-in-out;
 
       &:hover {
-        transform: scale($icon-hover-scale);
+        transform: scale(1.1);
       }
     }
   }
@@ -40,9 +40,9 @@
   &__channel-input-container {
     display: flex;
     align-items: center;
-    background-color: $input-bg-color;
+    background-color: $background-color-primary;
     border-radius: 6px;
-    border: 2px solid $input-border-color;
+    border: 2px solid $border-color-primary;
     transition: border-color 0.3s ease-in-out;
     padding: 0.3rem;
     height: 40px;
@@ -50,7 +50,7 @@
     justify-content: space-between;
 
     &:focus-within {
-      border: 2px solid $news-ticker-secondary-color; 
+      border: 2px solid $secondary-color; 
     }
 
     input {
@@ -64,13 +64,13 @@
       font-family: $primary-font-family;
 
       &::placeholder {
-        color: $placeholder-color;
+        color: $text-color-secondary;
       }
     }
 
     .channel-go-button {
       background-color: transparent;
-      color: $cream;
+      color: $text-color-secondary;
       border: none;
       padding: 5px;
       cursor: pointer;
@@ -80,7 +80,7 @@
       transition: background 0.3s;
 
       &:hover {
-        background-color: $primary-color-red-hover;
+        background-color: $primary-color;
       }
     }
   }
@@ -89,7 +89,7 @@
   .channel-button {
     background-color: transparent; 
     border: none;
-    color: $cream;
+    color: $text-color-secondary;
     padding: 0.5rem 1rem;
     font-size: 1rem;
     font-weight: 700;
@@ -99,7 +99,7 @@
     font-family: $primary-font-family;
 
     &:hover {
-      background-color: $primary-color-red-hover;
+      background-color: $primary-color;
     }
   }
 
@@ -108,7 +108,7 @@
   .fullscreen-button {
     background-color: transparent;
     border: none;
-    color: $cream;
+    color: $text-color-secondary;
     padding: 0.3rem .5rem;
     cursor: pointer;
     font-size: 1rem;
@@ -117,7 +117,7 @@
     font-family: $primary-font-family;
 
     &:hover {
-      background-color: $news-ticker-secondary-color;
+      background-color: $secondary-color;
     }
 
     svg {
@@ -143,7 +143,7 @@
     margin-top: 7px;
 
     &:hover {
-      transform: scale($icon-hover-scale);
+      transform: scale(1.1);
     }
   }
 
@@ -158,13 +158,13 @@
     transition: transform 0.2s;
 
     &:hover {
-      transform: scale($icon-hover-scale);
+      transform: scale (1.1);
     }
   }
 
   // Login Button (Only visible when not logged in)
   &__login-button {
-    background-color: $primary-color-red;
+    background-color: $primary-color;
     border: none;
     cursor: pointer;
     color: $channel-text-color;
@@ -176,7 +176,7 @@
     font-family: $primary-font-family;
     
     &:hover {
-      background-color: darken($primary-color-red, 5%);
+      background-color: darken($primary-color, 5%);
     }
   }
 
@@ -185,8 +185,8 @@
     position: absolute;
     top: 40px;
     right: 0;
-    background: $input-bg-color;
-    border: 1px solid $input-border-color;
+    background: $background-color-primary;
+    border: 1px solid $border-color-primary;
     border-radius: 5px;
     padding: 10px;
     display: flex;
@@ -198,18 +198,18 @@
 
     &__item {
       padding: 10px;
-      color: $channel-text-color;
+      color: $text-color-primary;
       text-decoration: none;
       transition: background 0.3s;
       display: block;
 
       &:hover {
-        background: $primary-color-charcoal;
+        background: $text-color-secondary;
       }
     }
 
     &__logout {
-      background: $primary-color-red;
+      background: $primary-color;
       color: $channel-text-color;
       border: none;
       padding: 10px;
@@ -219,7 +219,7 @@
       transition: background 0.3s;
 
       &:hover {
-        background: $primary-color-red-hover;
+        background: $text-color-secondary;
       }
     }
   }

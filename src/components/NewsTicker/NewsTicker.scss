@@ -4,10 +4,10 @@
   position: fixed;
   bottom: 0;
   width: 100%;
-  background-color: $news-ticker-bg-color;
-  color: $news-ticker-secondary-color;
-  font-family: $news-ticker-font-family;
-  font-size: $news-ticker-font-size;
+  background-color: $background-color-secondary;
+  color: $secondary-color;
+  font-family: $primary-font-family;
+  font-size: 29.1px;
   overflow: hidden;
   z-index: 4;
   padding: 3px 0;
@@ -16,7 +16,7 @@
 .ticker {
   display: inline-block;
   white-space: nowrap;
-  animation: scroll $ticker-animation-speed linear infinite;
+  animation: scroll 20s linear infinite;
 }
 
 @keyframes scroll {

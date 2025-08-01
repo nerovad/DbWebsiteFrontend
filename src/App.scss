@@ -18,7 +18,7 @@
 .trending-container {
   transition: width 0.3s ease-in-out;
   width: 70px; /* Default collapsed */
-  background-color: $input-bg-color;
+  background-color: $background-color-primary;
   overflow-y: auto;
 
   &.open {

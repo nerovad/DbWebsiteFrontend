@@ -8,23 +8,23 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6); 
-  backdrop-filter: blur(5px); 
+  background: rgba(0, 0, 0, 0.6); // You could replace with a variable if you want a custom overlay shade
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10001;
   font-family: $primary-font-family;
-  color: $primary-color-yellow; 
-  text-shadow: 2px 2px 5px rgba(234, 166, 18, 0.2);
+  color: $primary-color;
+  text-shadow: 2px 2px 5px rgba($accent-secondary-color, 0.2); // ✅ using accent-secondary instead of hardcoded yellow
 
   .tv-guide-content {
     width: 80%;
     max-width: 600px;
-    background: linear-gradient(to bottom, $input-bg-color, darken($input-bg-color, 10%));
-    border: 2px solid $input-border-color; 
+    background: linear-gradient(to bottom, $background-color-primary, darken($background-color-primary, 10%));
+    border: 2px solid $border-color-primary;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba($primary-color-red, 0.6); 
+    box-shadow: 0 0 10px rgba($primary-color, 0.6);
     padding: 20px;
     text-align: center;
     position: relative;
@@ -37,9 +37,9 @@
       width: 100%;
       height: 100%;
       background: repeating-linear-gradient(
-        rgba(234, 166, 18, 0.08) 0px,
-        rgba(234, 166, 18, 0.02) 3px
-      ); // Subtle scanline effect using yellow
+        rgba($primary-color, 0.03) 0px, // ✅ correct scanline color
+        rgba($accent-secondary-color, 0.02) 3px
+      );
       pointer-events: none;
     }
   }
@@ -48,7 +48,7 @@
     font-size: 22px;
     text-align: center;
     margin-bottom: 15px;
-    color: $primary-color-yellow;
+    color: $secondary-color;
   }
 
   ul {
@@ -57,16 +57,16 @@
     text-align: left;
 
     li {
-      background: rgba(193, 39, 45, 0.2);
+      background: rgba($primary-color, 0.2); // ✅ previously hardcoded rgba(193, 39, 45, 0.2)
       padding: 10px;
       margin: 5px 0;
       border-radius: 5px;
       font-size: 16px;
       transition: background 0.3s;
-      color: white;
+      color: $channel-text-color;
 
       &:hover {
-        background: $primary-color-red;
+        background: $primary-color;
       }
     }
   }
@@ -76,9 +76,9 @@
     width: 10%;
     top: 10px;
     right: 10px;
-    background: $input-bg-color;
+    background: $background-color-primary;
     border: none;
-    color: white;
+    color: $channel-text-color;
     padding: 8px 12px;
     font-size: 16px;
     font-weight: bold;
@@ -87,7 +87,7 @@
     transition: background 0.3s;
 
     &:hover {
-      background: $primary-color-yellow-hover;
+      background: $secondary-color;
     }
   }
 }
