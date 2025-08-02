@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaVolumeMute, FaExpand } from "react-icons/fa";
-import Logo from "../../assets/ChatGPT Image Jun 20, 2025, 05_58_07 PM.png";
+import Logo from "../../assets/cinezoo_Logo_V3.png";
 import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import "./Navigation.scss";
 
@@ -69,7 +69,9 @@ const SearchNavBar: React.FC<NavBarProps> = ({
         <button className="channel-button" onClick={goToPreviousVideo}>
           Ch-
         </button>
-
+        <button className="channel-button" onClick={goToNextVideo}>
+          Ch+
+        </button>
         <div className="search-navbar__channel-input-container">
           <input
             type="text"
@@ -83,10 +85,6 @@ const SearchNavBar: React.FC<NavBarProps> = ({
             Go
           </button>
         </div>
-
-        <button className="channel-button" onClick={goToNextVideo}>
-          Ch+
-        </button>
 
         {/* Mute Button */}
         <button className="mute-button" onClick={toggleMute}>
