@@ -59,7 +59,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
     { src: "https://dainbramage.tv:8088/channel2/channel2.m3u8", channel: "channel-1" },
     { src: "https://dainbramage.tv:8088/channel17/channel17.m3u8", channel: "channel-2" },
     { src: "https://dainbramage.tv:8088/channel29/channel29.m3u8", channel: "channel-3" },
-    { src: "https://dainbramage.tv:8088/channel31/channel31.m3u8", channel: "channel-4" }
+    { src: "https://dainbramage.tv:8088/channel31/channel31.m3u8", channel: "channel-4" },
+    { src: "https://dainbramage.tv:8088/channel99/channel99.m3u8", channel: "channel-99" }
   ];
 
   const getClassNames = () => {
