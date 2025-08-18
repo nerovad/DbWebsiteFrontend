@@ -16,7 +16,7 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const url = authMode === "login" ? "http://localhost:5000/login" : "http://localhost:5000/register";
+    const url = authMode === "login" ? "http://localhost:4000/login" : "http://localhost:4000/register";
     const body = authMode === "login"
       ? { email: emailOrUsername, username: emailOrUsername, password }
       : { email: emailOrUsername, username: emailOrUsername, password, confirmPassword };
