@@ -4,7 +4,7 @@ import "./Chatbox.scss";
 import RightArrowIcon from "../../assets/Right_Arrow.svg";
 import { useChatStore } from "../../store/useChatStore";
 
-const socket = io("http://localhost:5000", {
+const socket = io("http://localhost:4000", {
   withCredentials: true,
 });
 
@@ -21,7 +21,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetch("http://localhost:5000/profile", {
+      fetch("http://localhost:4000/profile", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -74,7 +74,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
     socket.emit("sendMessage", { userId, message, channelId });
 
     // Fetch the username from Zustand or set fallback as "Unknown"
-    fetch("http://localhost:5000/profile", {
+    fetch("http://localhost:4000/profile", {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     })
       .then((res) => res.json())
