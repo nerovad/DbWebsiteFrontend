@@ -12,40 +12,75 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (authMode === "register" && password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
 
-    const url = authMode === "login" ? "http://localhost:4000/login" : "http://localhost:4000/register";
-    const body = authMode === "login"
-      ? { email: emailOrUsername, username: emailOrUsername, password }
-      : { email: emailOrUsername, username: emailOrUsername, password, confirmPassword };
+    setSubmitting(true);
+    try {
+      const url =
+        authMode === "login"
+          ? "http://localhost:4000/api/auth/login"
+          : "http://localhost:4000/api/auth/register";
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+      // Your backend accepts either email OR username for login.
+      // For registration, you're using one field for both (okay for now).
+      const body =
+        authMode === "login"
+          ? { email: emailOrUsername, username: emailOrUsername, password }
+          : { email: emailOrUsername, username: emailOrUsername, password };
 
-    const data = await response.json();
-    if (response.ok) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      // Don’t call res.json() blindly—404/HTML will crash JSON.parse
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        // response wasn’t JSON (e.g., 404 HTML); leave data as {}
+      }
+
+      if (!res.ok) {
+        const message =
+          data?.error ||
+          data?.message ||
+          `Request failed (${res.status})${text ? `: ${text.slice(0, 200)}` : ""}`;
+        throw new Error(message);
+      }
+
       if (authMode === "login") {
+        if (!data?.token) throw new Error("No token returned from server.");
         localStorage.setItem("token", data.token);
         setIsLoggedIn(true);
-        setIsAuthOpen(false); // ✅ Close modal on login
+        setIsAuthOpen(false);
       } else {
         alert("Registration successful! You can now log in.");
-        setAuthMode("login"); // ✅ Switch to login
+        setAuthMode("login");
       }
-    } else {
-      alert(data.error);
+    } catch (err: any) {
+      console.error("Auth error:", err);
+      alert(err?.message || "Something went wrong.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="auth-overlay">
       <div className="auth-card">
-        <button className="close-btn" onClick={() => setIsAuthOpen(false)}>✖</button>
+        <button className="close-btn" onClick={() => setIsAuthOpen(false)} disabled={submitting}>
+          ✖
+        </button>
         <h2>{authMode === "login" ? "Login" : "Register"}</h2>
         <form onSubmit={handleSubmit}>
           <input
@@ -54,6 +89,7 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
             value={emailOrUsername}
             onChange={(e) => setEmailOrUsername(e.target.value)}
             required
+            disabled={submitting}
           />
           <input
             type="password"
@@ -61,6 +97,7 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={submitting}
           />
           {authMode === "register" && (
             <input
@@ -69,9 +106,12 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              disabled={submitting}
             />
           )}
-          <button type="submit">{authMode === "login" ? "Login" : "Register"}</button>
+          <button type="submit" disabled={submitting}>
+            {submitting ? "Please wait…" : authMode === "login" ? "Login" : "Register"}
+          </button>
         </form>
         <p>
           {authMode === "login" ? "Don't have an account?" : "Already have an account?"}
@@ -85,4 +125,3 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
 };
 
 export default Auth;
-
