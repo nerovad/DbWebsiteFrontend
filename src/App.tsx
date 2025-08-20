@@ -10,6 +10,7 @@ import Auth from "./components/Auth/Auth.tsx";
 import Settings from "./components/Settings/Settings.tsx";
 import Upload from "./components/Upload/Upload.tsx";
 import Profile from "./components/Profile/Profile.tsx";
+import AdminFestivals from "./components/Pages/AdminFestivals.tsx";
 import "./App.scss";
 
 
@@ -136,6 +137,8 @@ const App: React.FC = () => {
         <Route path="/settings" element={<Settings />} />
 
         <Route path="/profile" element={<Profile />} />
+
+        <Route path="/admin/festivals" element={<AdminFestivals />} />
       </Routes>
       {isAuthOpen && (
         <Auth

@@ -119,6 +119,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
                 <Link to="/profile" className="profile-dropdown__item">Profile</Link>
                 <Link to="/settings" className="profile-dropdown__item">Settings</Link>
                 <Link to="/upload" className="profile-dropdown__item">Upload</Link>
+                <Link to="/admin/festivals" className="profile-dropdown__item">Admin</Link>
                 <button onClick={handleLogout} className="profile-dropdown__logout">Log out</button>
               </div>
             )}

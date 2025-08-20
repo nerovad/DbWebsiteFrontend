@@ -23,7 +23,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch("http://localhost:4000/profile", {
+    fetch("http://localhost:4000/api/profile", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
