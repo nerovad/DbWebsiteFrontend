@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./CreateChannelForm.scss";
 
 const CreateChannelForm: React.FC = () => {
   const [name, setName] = useState("");

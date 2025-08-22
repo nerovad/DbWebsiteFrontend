@@ -141,7 +141,6 @@ const App: React.FC = () => {
 
         <Route path="/admin/festivals" element={<AdminFestivals />} />
 
-        <Route path="/Channel/CreateChannelForm" element={<CreateChannelForm />} />
       </Routes>
       {isAuthOpen && (
         <Auth

@@ -5,6 +5,9 @@ import Logo from "../../assets/cinezoo_Logo_V3.png";
 import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import "./Navigation.scss";
 
+// ⬇️ import the modal we created earlier
+import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
+
 interface NavBarProps {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
@@ -18,6 +21,10 @@ interface NavBarProps {
   toggleMute: () => void;
   toggleFullscreen: () => void;
   loadVideo: (src: string) => void;
+
+  // ⬇️ these were used but not typed in your snippet
+  setIsAuthOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setAuthMode: (mode: "login" | "register") => void;
 }
 
 const SearchNavBar: React.FC<NavBarProps> = ({
@@ -39,9 +46,10 @@ const SearchNavBar: React.FC<NavBarProps> = ({
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [channelInput, setChannelInput] = useState("");
+  const [isCreateOpen, setIsCreateOpen] = useState(false); // ⬅️ modal state
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove JWT
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
   };
 
@@ -49,7 +57,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
     const channelNumber = parseInt(channelInput, 10);
     if (!isNaN(channelNumber) && channelNumber >= 0 && channelNumber < videoLinks.length) {
       setCurrentIndex(channelNumber);
-      loadVideo(videoLinks[channelNumber].src); // ✅ Load video on channel change
+      loadVideo(videoLinks[channelNumber].src);
     } else {
       alert("Invalid channel number");
     }
@@ -99,33 +107,54 @@ const SearchNavBar: React.FC<NavBarProps> = ({
 
       {/* Right Links & Profile/Login */}
       <div className="search-navbar__links">
-        <a href="#" className="search-navbar__link" onClick={() => setIsGuideOpen?.((prev) => !prev)}>
+        <a
+          href="#"
+          className="search-navbar__link"
+          onClick={(e) => { e.preventDefault(); setIsGuideOpen?.((prev) => !prev); }}
+        >
           <img src={TvGuideIcon} alt="TV Guide" />
         </a>
 
-        {/* ✅ Update Login Button to Open Auth Modal Instead */}
+        {/* ⬇️ New Create Channel button */}
+        {isLoggedIn && (
+          <button
+            id="create-channel-trigger"
+            className="search-navbar__create-channel-button"
+            onClick={() => setIsCreateOpen(true)}
+          >
+            + Create Channel
+          </button>
+        )}
+
         {!isLoggedIn ? (
           <>
-            <button onClick={() => { setAuthMode("login"); setIsAuthOpen(true); }} className="search-navbar__login-button">
+            <button
+              onClick={() => { setAuthMode("login"); setIsAuthOpen(true); }}
+              className="search-navbar__login-button"
+            >
               Login
             </button>
           </>
         ) : (
-          // Show Profile icon if logged in
           <div className="search-navbar__profile" onClick={() => setShowDropdown(!showDropdown)}>
             <FaUserCircle className="search-navbar__profile-icon" size={24} />
             {showDropdown && (
-              <div className="profile-dropdown">
+              <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
                 <Link to="/profile" className="profile-dropdown__item">Profile</Link>
                 <Link to="/settings" className="profile-dropdown__item">Settings</Link>
-                <Link to="/upload" className="profile-dropdown__item">Upload</Link>
-                <Link to="/admin/festivals" className="profile-dropdown__item">Admin</Link>
                 <button onClick={handleLogout} className="profile-dropdown__logout">Log out</button>
               </div>
             )}
           </div>
         )}
       </div>
+
+      {/* ⬇️ Modal lives at root of the navbar so overlay sits above the app */}
+      <CreateChannelModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        excludeClickId="create-channel-trigger"
+      />
     </div>
   );
 };
