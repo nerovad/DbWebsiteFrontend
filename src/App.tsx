@@ -11,6 +11,7 @@ import Settings from "./components/Settings/Settings.tsx";
 import Upload from "./components/Upload/Upload.tsx";
 import Profile from "./components/Profile/Profile.tsx";
 import AdminFestivals from "./components/Pages/AdminFestivals.tsx";
+import CreateChannelForm from "./components/Channel/CreateChannelForm";
 import "./App.scss";
 
 
@@ -139,6 +140,8 @@ const App: React.FC = () => {
         <Route path="/profile" element={<Profile />} />
 
         <Route path="/admin/festivals" element={<AdminFestivals />} />
+
+        <Route path="/Channel/CreateChannelForm" element={<CreateChannelForm />} />
       </Routes>
       {isAuthOpen && (
         <Auth
