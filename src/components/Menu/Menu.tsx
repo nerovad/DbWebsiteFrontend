@@ -1,8 +1,9 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import "./Menu.scss"; // keep your existing styles
+import "./Menu.scss";
 import LeftArrowIcon from "../../assets/Left_Arrow.svg";
+import { useChatStore } from "../../store/useChatStore";
 
-/* === PROPS (unchanged) === */
+/* === PROPS === */
 interface UtilitiesProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,15 +28,14 @@ type BallotSubmit = {
   comment?: string;
 };
 
-/* === REUSABLE MODAL === */
+/* === REUSABLE MODAL (unchanged) === */
 const Modal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
-  width?: number; // px
+  width?: number;
 }> = ({ isOpen, onClose, title, children, width = 560 }) => {
-  // ESC to close
   const onKey = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape") onClose();
   }, [onClose]);
@@ -43,7 +43,6 @@ const Modal: React.FC<{
   useEffect(() => {
     if (!isOpen) return;
     document.addEventListener("keydown", onKey);
-    // prevent body scroll while modal is open
     const original = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
@@ -56,11 +55,7 @@ const Modal: React.FC<{
 
   return (
     <div className="modal-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label={title || "Dialog"}>
-      <div
-        className="modal-card"
-        style={{ maxWidth: width }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="modal-card" style={{ maxWidth: width }} onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h4>{title}</h4>
           <button className="modal-close" onClick={onClose} aria-label="Close dialog">×</button>
@@ -71,7 +66,7 @@ const Modal: React.FC<{
   );
 };
 
-/* === BALLOT WIDGET === */
+/* === BALLOT WIDGET (unchanged UI) === */
 const TAGS = ["Cinematography", "Story", "Originality", "Sound", "Editing"];
 
 const StarRow: React.FC<{ value: number; onChange: (v: number) => void }> = ({ value, onChange }) => {
@@ -102,7 +97,7 @@ const StarRow: React.FC<{ value: number; onChange: (v: number) => void }> = ({ v
 };
 
 const VotingBallot: React.FC<{
-  film: Film;
+  film: Film | null;
   onSubmit: (payload: BallotSubmit) => void;
   onSkip: () => void;
 }> = ({ film, onSubmit, onSkip }) => {
@@ -115,6 +110,7 @@ const VotingBallot: React.FC<{
     setTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
 
   const submit = () => {
+    if (!film) return;
     onSubmit({
       filmId: film.id,
       score,
@@ -122,6 +118,10 @@ const VotingBallot: React.FC<{
       comment: comment.trim() || undefined,
     });
   };
+
+  if (!film) {
+    return <p>No films available for this channel yet.</p>;
+  }
 
   return (
     <div className="ballot-card">
@@ -212,18 +212,42 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
   const [activeModal, setActiveModal] = useState<ModalKind>(null);
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  // Example "current film"
-  const currentFilm: Film = useMemo(
-    () => ({
-      id: "abc123",
-      title: "Outside The Lines",
-      creator: "Studio Nimbus",
-      thumbnail: "/images/sample-thumb.jpg",
-      duration: "07:42",
-      synopsis: "A kinetic sketch about rules, rebellion, and crayons.",
-    }),
-    []
-  );
+  // get current channel from store (VideoPlayer sets it)
+  const { channelId } = useChatStore(); // assumes store has { channelId }
+  const [films, setFilms] = useState<Film[]>([]);
+  const [idx, setIdx] = useState(0);
+
+  // fetch films whenever channel changes
+  useEffect(() => {
+    let on = true;
+    (async () => {
+      if (!channelId) { setFilms([]); return; }
+      try {
+        const res = await fetch(`/api/channels/${encodeURIComponent(channelId)}/films`);
+        if (!res.ok) throw new Error("Failed to load films");
+        const data = await res.json();
+        if (on) {
+          // normalize keys to Film
+          const mapped: Film[] = (data || []).map((f: any) => ({
+            id: String(f.id),
+            title: f.title,
+            creator: f.creator ?? undefined,
+            thumbnail: f.thumbnail ?? undefined,
+            duration: f.duration ?? undefined,
+            synopsis: f.synopsis ?? undefined,
+          }));
+          setFilms(mapped);
+          setIdx(0);
+        }
+      } catch (e) {
+        console.error(e);
+        if (on) { setFilms([]); setIdx(0); }
+      }
+    })();
+    return () => { on = false; };
+  }, [channelId]);
+
+  const currentFilm: Film | null = films.length ? films[idx % films.length] : null;
 
   const utilities = [
     { key: "ballot" as const, name: "Voting Ballot", description: "Rate and support your favorite entries." },
@@ -232,9 +256,29 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
     { key: "leaderboard" as const, name: "All Time Leaderboard", description: "Top-ranked filmmakers." },
   ];
 
+  const submitVote = async (payload: BallotSubmit) => {
+    if (!channelId) return;
+    // ratings path (battle mode can use a different endpoint later)
+    try {
+      await fetch("/api/ratings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          channel: channelId,         // slug or key
+          film_id: payload.filmId,    // PK from films
+          score: payload.score,       // 1..10
+          tags: payload.tags,         // string[]
+          comment: payload.comment,   // string | undefined
+        }),
+      });
+    } catch (e) {
+      console.error("vote failed", e);
+    }
+  };
+
   return (
     <>
-      {/* === SIDEBAR (unchanged) === */}
+      {/* === SIDEBAR === */}
       <div className={`utilities-container ${isOpen ? "open" : ""}`}>
         <button className={`toggle-button-left ${isOpen ? "open" : ""}`} onClick={toggleMenu}>
           <img src={LeftArrowIcon} alt="Toggle" />
@@ -256,6 +300,14 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
               </li>
             ))}
           </ul>
+          {/* Optional quick nav between films when ballot open */}
+          {activeModal === "ballot" && films.length > 1 && (
+            <div className="film-stepper">
+              <button onClick={() => setIdx((i) => (i - 1 + films.length) % films.length)}>Prev Film</button>
+              <span>{films.length ? `${(idx % films.length) + 1} / ${films.length}` : "0 / 0"}</span>
+              <button onClick={() => setIdx((i) => (i + 1) % films.length)}>Next Film</button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -263,18 +315,19 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
       <Modal
         isOpen={activeModal === "ballot"}
         onClose={() => setActiveModal(null)}
-        title="Voting Ballot"
+        title={channelId ? `Voting Ballot • ${channelId}` : "Voting Ballot"}
         width={620}
       >
         <VotingBallot
           film={currentFilm}
-          onSubmit={(payload) => {
-            // TODO: POST to backend /api/votes
-            console.log("SUBMIT BALLOT:", payload);
+          onSubmit={async (payload) => {
+            await submitVote(payload);
+            // rotate to next film after vote
+            setIdx((i) => (i + 1) % Math.max(1, films.length));
             setActiveModal(null);
           }}
           onSkip={() => {
-            console.log("SKIP FILM:", currentFilm.id);
+            setIdx((i) => (i + 1) % Math.max(1, films.length));
             setActiveModal(null);
           }}
         />
