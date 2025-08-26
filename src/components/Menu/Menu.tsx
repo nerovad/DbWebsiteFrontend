@@ -66,7 +66,7 @@ const Modal: React.FC<{
   );
 };
 
-/* === BALLOT WIDGET (unchanged UI) === */
+/* === BALLOT WIDGET (single view only) === */
 const TAGS = ["Cinematography", "Story", "Originality", "Sound", "Editing"];
 
 const StarRow: React.FC<{ value: number; onChange: (v: number) => void }> = ({ value, onChange }) => {
@@ -98,20 +98,28 @@ const StarRow: React.FC<{ value: number; onChange: (v: number) => void }> = ({ v
 
 const VotingBallot: React.FC<{
   film: Film | null;
-  onSubmit: (payload: BallotSubmit) => void;
-  onSkip: () => void;
-}> = ({ film, onSubmit, onSkip }) => {
+  onSubmit: (payload: BallotSubmit) => Promise<void> | void;
+  onNext: () => void; // next film (skip)
+}> = ({ film, onSubmit, onNext, onSeeAll }) => {
   const [score, setScore] = useState<number>(8);
   const [useStars, setUseStars] = useState<boolean>(true);
   const [tags, setTags] = useState<string[]>([]);
   const [comment, setComment] = useState<string>("");
 
+  // reset when film changes
+  useEffect(() => {
+    setScore(8);
+    setUseStars(true);
+    setTags([]);
+    setComment("");
+  }, [film?.id]);
+
   const toggleTag = (t: string) =>
     setTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
 
-  const submit = () => {
+  const submit = async () => {
     if (!film) return;
-    onSubmit({
+    await onSubmit({
       filmId: film.id,
       score,
       tags,
@@ -119,9 +127,7 @@ const VotingBallot: React.FC<{
     });
   };
 
-  if (!film) {
-    return <p>No films available for this channel yet.</p>;
-  }
+  if (!film) return <p>No films available for this channel yet.</p>;
 
   return (
     <div className="ballot-card">
@@ -201,9 +207,45 @@ const VotingBallot: React.FC<{
       </div>
 
       <div className="ballot-actions">
-        <button className="btn-secondary" onClick={onSkip}>Skip</button>
-        <button className="btn-primary" onClick={submit}>Submit Vote</button>
+        <button className="btn-secondary" onClick={onSeeAll}>
+          See all films
+        </button>
+
+        <button className="btn-primary" onClick={submit}>
+          Submit Vote
+        </button>
       </div>
+
+    </div>
+  );
+};
+
+const FilmGrid: React.FC<{
+  films: Film[];
+  selectedIndex: number;
+  onPick: (index: number) => void;
+}> = ({ films, selectedIndex, onPick }) => {
+  return (
+    <div className="film-grid" role="list">
+      {films.map((f, i) => (
+        <button
+          key={f.id}
+          role="listitem"
+          className={`film-card ${i === selectedIndex ? "selected" : ""}`}
+          onClick={() => onPick(i)}
+          title={`Select ${f.title}`}
+        >
+          <div className="film-thumb" aria-hidden>
+            {f.thumbnail ? <img src={f.thumbnail} alt="" /> : <div className="thumb-fallback">{f.title.charAt(0)}</div>}
+          </div>
+          <div className="film-info">
+            <div className="film-title">{f.title}</div>
+            <div className="film-meta">
+              {f.creator ? `by ${f.creator}` : ""} {f.duration ? `• ${f.duration}` : ""}
+            </div>
+          </div>
+        </button>
+      ))}
     </div>
   );
 };
@@ -216,6 +258,10 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
   const { channelId } = useChatStore(); // assumes store has { channelId }
   const [films, setFilms] = useState<Film[]>([]);
   const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    if (activeModal === "ballot") setView("grid");
+  }, [activeModal]);
 
   // fetch films whenever channel changes
   useEffect(() => {
@@ -248,7 +294,7 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
   }, [channelId]);
 
   const currentFilm: Film | null = films.length ? films[idx % films.length] : null;
-
+  const [view, setView] = useState<"single" | "grid">("single");
   const utilities = [
     { key: "ballot" as const, name: "Voting Ballot", description: "Rate and support your favorite entries." },
     { key: "battle" as const, name: "Battle Royale", description: "Films go head-to-head. You decide the winner." },
@@ -310,54 +356,60 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
           )}
         </div>
       </div>
-
       {/* === MODALS === */}
       <Modal
         isOpen={activeModal === "ballot"}
         onClose={() => setActiveModal(null)}
         title={channelId ? `Voting Ballot • ${channelId}` : "Voting Ballot"}
-        width={620}
-      >
-        <VotingBallot
-          film={currentFilm}
-          onSubmit={async (payload) => {
-            await submitVote(payload);
-            // rotate to next film after vote
-            setIdx((i) => (i + 1) % Math.max(1, films.length));
-            setActiveModal(null);
-          }}
-          onSkip={() => {
-            setIdx((i) => (i + 1) % Math.max(1, films.length));
-            setActiveModal(null);
-          }}
-        />
-      </Modal>
-
-      <Modal
-        isOpen={activeModal === "battle"}
-        onClose={() => setActiveModal(null)}
-        title="Battle Royale"
-        width={720}
-      >
-        <p>Coming soon: pick the winner between two head-to-head films.</p>
-      </Modal>
-
-      <Modal
-        isOpen={activeModal === "bracket"}
-        onClose={() => setActiveModal(null)}
-        title="Tournament Bracket"
         width={880}
       >
-        <p>Coming soon: live bracket view and rounds.</p>
-      </Modal>
+        <div className="ballot-wrap">
+          {/* Topbar */}
+          <div className="ballot-topbar">
+            {view === "single" && films.length > 1 && (
+              <div className="film-stepper">
+                <button
+                  className="btn-ghost"
+                  onClick={() => setIdx((i) => (i - 1 + films.length) % films.length)}
+                >
+                  ◀ Prev
+                </button>
+                <span className="step-indicator">
+                  {films.length ? `${(idx % films.length) + 1} / ${films.length}` : "0 / 0"}
+                </span>
+                <button
+                  className="btn-ghost"
+                  onClick={() => setIdx((i) => (i + 1) % films.length)}
+                >
+                  Next ▶
+                </button>
+              </div>
+            )}
+          </div>
 
-      <Modal
-        isOpen={activeModal === "leaderboard"}
-        onClose={() => setActiveModal(null)}
-        title="All Time Leaderboard"
-        width={720}
-      >
-        <p>Coming soon: the top-ranked filmmakers of all time.</p>
+          {/* Body */}
+          {view === "grid" ? (
+            <FilmGrid
+              films={films}
+              selectedIndex={idx}
+              onPick={(i) => {
+                setIdx(i);
+                setView("single");
+              }}
+            />
+          ) : (
+            <VotingBallot
+              film={films.length ? films[idx % films.length] : null}
+              onSubmit={async (payload) => {
+                await submitVote(payload);
+                // advance after vote
+                setIdx((i) => (i + 1) % Math.max(1, films.length));
+              }}
+              onNext={() => setIdx((i) => (i + 1) % Math.max(1, films.length))}
+              onSeeAll={() => setView("grid")}
+            />
+          )}
+        </div>
       </Modal>
     </>
   );

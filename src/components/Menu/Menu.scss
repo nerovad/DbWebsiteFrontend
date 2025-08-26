@@ -339,3 +339,197 @@
   .modal-backdrop { backdrop-filter: none; }
   .star { transition: none; }
 }
+.ballot-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Top bar: view toggle + stepper */
+/* ===== Ballot topbar (simplified) ===== */
+.ballot-topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  .see-all-btn {
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    background: rgba(255, 255, 255, 0.06);
+    color: $channel-text-color;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: $primary-font-family;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 120ms ease, border-color 120ms ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+  }
+}
+
+/* Toggle between "Rate one-by-one" and "See all films" */
+.view-toggle {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+
+  .tab {
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: $channel-text-color;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: $primary-font-family;
+
+    &.active {
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+}
+
+/* Prev/Next mini stepper */
+.film-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  .btn-ghost {
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    background: transparent;
+    color: $channel-text-color;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: $primary-font-family;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  .step-indicator {
+    opacity: 0.85;
+    font-weight: 600;
+    font-family: $primary-font-family;
+  }
+}
+
+/* Grid of all films */
+.film-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+/* Individual film card used in the grid selector */
+.film-card {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  text-align: left;
+  color: $channel-text-color;
+  transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  /* Selected film highlight */
+  &.selected {
+    /* use CSS var if present; fall back to theme primary */
+    --accent: #8cf;
+    border-color: var(--accent, $primary-color);
+    box-shadow: 0 0 0 2px rgba(140, 200, 255, 0.25) inset;
+  }
+
+  .film-thumb {
+    width: 56px;
+    height: 56px;
+    flex: 0 0 auto;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.06);
+    display: grid;
+    place-items: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-fallback {
+      font-weight: 800;
+      opacity: 0.7;
+      color: $channel-text-color;
+    }
+  }
+
+  .film-info {
+    display: grid;
+    gap: 4px;
+    align-content: center;
+
+    .film-title {
+      font-weight: 700;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    .film-meta {
+      opacity: 0.75;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+  }
+}
+/* === Star colors === */
+.star {
+  color: rgba(255, 255, 255, 0.35);  /* unfilled/star baseline */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.star.filled {
+  color: $primary-color;             /* filled/star color */
+  text-shadow: 0 0 8px rgba($primary-color, 0.25);
+}
+
+/* Optional: nicer hover preview */
+.star:hover {
+  color: lighten($primary-color, 8%);
+  opacity: 1;
+}
+
+/* Keyboard focus ring for accessibility */
+.star:focus-visible {
+  outline: 2px solid rgba($primary-color, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Wider modal for grid view on small screens */
+@media (max-width: 640px) {
+  .film-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}
