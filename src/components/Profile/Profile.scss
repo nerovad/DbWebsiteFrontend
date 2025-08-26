@@ -1,37 +1,353 @@
 @use "../../styles/_variables.scss" as *;
 
-.profile-page {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-  background: #222;
-  color: #fff;
-  border-radius: 10px;
-  text-align: center;
+/* ========= Profile (DainBramage branding) ========= */
 
-  .profile-title {
-    font-size: 28px;
-    margin-bottom: 20px;
+.profile-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px 48px;
+  font-family: $primary-font-family;
+  color: $text-color-primary;
+
+  .muted { color: $text-color-secondary; }
+
+  /* ===== Header ===== */
+  .profile-header {
+    background: $background-color-primary;
+    border: 1px solid $border-color-primary;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
   }
 
-  .profile-section {
-    background: #333;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    text-align: left;
+  .profile-banner {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+
+    .banner-fallback {
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(120% 120% at 10% 0%, rgba($primary-color, .15), transparent 60%),
+        linear-gradient(135deg, rgba($secondary-color, .08), rgba($accent-secondary-color, .06));
+    }
+  }
+
+  .profile-header-content {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: end;
+    padding: 0 20px 16px;
+    margin-top: -48px;
+  }
+
+  .avatar-wrap { position: relative; width: 96px; height: 96px; }
+  .avatar {
+    width: 96px; height: 96px; border-radius: 50%;
+    border: 4px solid $background-color-primary;
+    object-fit: cover;
+  }
+  .avatar.placeholder {
+    display: grid; place-items: center;
+    background: $background-color-secondary; color: $channel-text-color;
+    font-weight: 800; font-size: 32px;
+    width: 96px; height: 96px; border-radius: 50%;
+    border: 4px solid $background-color-primary;
+  }
+
+  .identity {
+    .display-name { font-size: 24px; font-weight: 800; margin: 0 0 4px; color: $text-color-primary; }
+    .handle { color: $text-color-secondary; margin-bottom: 8px; }
+    .meta {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      .chip {
+        display: inline-flex; align-items: center;
+        padding: 6px 10px; border-radius: 999px;
+        background: $background-color-secondary;
+        border: 1px solid $border-color-primary;
+        color: $text-color-primary; font-size: 13px;
+
+        &.link {
+          text-decoration: none;
+          border-color: rgba($primary-color, .6);
+          box-shadow: 0 0 0 1px rgba($primary-color, .3) inset;
+          &:hover { box-shadow: 0 0 0 2px rgba($primary-color, .45) inset; }
+        }
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex; gap: 8px; justify-self: end; align-self: center;
+  }
+
+  .btn {
+    border: 1px solid $border-color-primary;
+    background: $background-color-secondary;
+    color: $text-color-primary;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .08s ease, background-color .2s ease, box-shadow .2s ease, border-color .2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      background: mix($background-color-secondary, $primary-color, 12%);
+      box-shadow: 0 8px 18px rgba($primary-color, .15);
+    }
+
+    &.primary {
+      border-color: $primary-color;
+      background: $primary-color;
+      color: $channel-text-color;
+      &:hover {
+        background: mix($primary-color, $accent-secondary-color, 12%);
+        box-shadow: 0 8px 20px rgba($primary-color, .25);
+      }
+    }
+
+    &.ghost {
+      background: transparent;
+      &:hover { background: rgba($primary-color, .1); }
+    }
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid $border-color-primary;
+    background: $background-color-secondary;
+
+    .stat {
+      padding: 12px 16px; text-align: center;
+      .value { font-size: 20px; font-weight: 800; color: $text-color-primary; }
+      .label { font-size: 12px; color: $text-color-secondary; }
+    }
+  }
+
+  /* ===== Tabs ===== */
+  .profile-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    margin: 18px 4px 12px;
+  }
+
+  .tab {
+    padding: 10px 14px; border-radius: 999px;
+    border: 1px solid $border-color-primary;
+    background: $background-color-secondary;
+    color: $text-color-primary; font-weight: 700; cursor: pointer;
+    transition: background .2s ease, box-shadow .2s ease, border-color .2s ease;
+
+    &:hover {
+      background: mix($background-color-secondary, $primary-color, 14%);
+      box-shadow: 0 0 0 2px rgba($primary-color, .35) inset;
+    }
+
+    &.active {
+      border-color: $primary-color;
+      background: $primary-color;
+      color: $channel-text-color;
+      box-shadow: 0 8px 18px rgba($primary-color, .25);
+    }
+  }
+
+  /* ===== Panels ===== */
+  .panel {
+    background: $background-color-primary;
+    border: 1px solid $border-color-primary;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    margin-top: 12px;
 
     h2 {
-      font-size: 22px;
-      border-bottom: 2px solid #ff4500;
-      padding-bottom: 5px;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 16px;
-      color: #ccc;
+      font-size: 18px; margin: 0 0 12px;
+      border-bottom: 2px solid $primary-color;
+      padding-bottom: 6px;
+      color: $text-color-primary;
     }
   }
-}
 
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  /* ===== Overview ===== */
+  .about-grid {
+    display: grid; grid-template-columns: 1.2fr .8fr; gap: 16px;
+  }
+  .field-label { font-size: 12px; color: $text-color-secondary; margin-bottom: 6px; display: block; }
+  .input {
+    width: 100%; padding: 10px 12px; border-radius: 10px;
+    background: $background-color-secondary;
+    border: 1px solid $border-color-primary;
+    color: $text-color-primary;
+    &.textarea { resize: vertical; }
+  }
+  .row-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .socials { margin: 0; padding: 0 0 0 16px;
+    a { color: $primary-color; text-decoration: none;
+      &:hover { text-decoration: underline; color: mix($primary-color, $accent-secondary-color, 20%); }
+    }
+    li { color: $text-color-secondary; }
+  }
+
+  /* ===== Cards (channels, films) ===== */
+  .card-grid {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+  .card {
+    border: 1px solid $border-color-primary;
+    background: $background-color-secondary;
+    border-radius: 14px; overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: rgba($primary-color, .6);
+      box-shadow: 0 12px 28px rgba($primary-color, .18);
+    }
+
+    .thumb {
+      position: relative; background: rgba(0,0,0,.35); height: 140px;
+
+      img { width: 100%; height: 140px; object-fit: cover; display: block; }
+
+      .thumb-fallback {
+        width: 100%; height: 140px;
+        background:
+          linear-gradient(135deg, rgba($primary-color, .18), rgba($primary-color, .06)),
+          linear-gradient(45deg, rgba($secondary-color, .12), rgba($accent-secondary-color, .10));
+      }
+
+      .live-pill {
+        position: absolute; top: 10px; left: 10px;
+        background: $accent-secondary-color; color: $channel-text-color;
+        font-size: 12px; font-weight: 800; padding: 6px 8px; border-radius: 6px;
+        box-shadow: 0 4px 10px rgba($accent-secondary-color, .35);
+      }
+
+      .duration {
+        position: absolute; bottom: 10px; right: 10px;
+        background: rgba(0,0,0,.6); color: $channel-text-color;
+        font-size: 12px; font-weight: 700; padding: 4px 6px; border-radius: 6px;
+      }
+    }
+
+    .card-body { padding: 12px; }
+    .card-title { font-weight: 800; margin-bottom: 6px; color: $text-color-primary; }
+    .card-desc { color: $text-color-secondary; font-size: 14px; }
+    .card-actions { display: flex; gap: 8px; margin-top: 10px; }
+  }
+
+  /* ===== Lists (awards, companies) ===== */
+  .list { margin: 0; padding: 0; list-style: none; }
+  .list-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px;
+    border: 1px solid $border-color-primary;
+    border-radius: 12px;
+    background: $background-color-secondary;
+    margin-bottom: 10px;
+  }
+  .award-name, .company-name { font-weight: 800; color: $text-color-primary; }
+  .award-meta, .company-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    display: inline-flex; align-items: center; padding: 6px 10px;
+    border-radius: 999px; background: $background-color-secondary;
+    border: 1px solid $border-color-primary;
+    font-size: 12px; color: $text-color-primary; white-space: nowrap;
+
+    &.link {
+      border-color: rgba($secondary-color, .6);
+      box-shadow: 0 0 0 1px rgba($secondary-color, .3) inset;
+      &:hover { box-shadow: 0 0 0 2px rgba($secondary-color, .45) inset; }
+    }
+  }
+
+  /* ===== Business Card ===== */
+  .biz-grid {
+    display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px;
+  }
+  .form-row { margin-bottom: 12px; }
+  .form-row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .biz-preview { display: flex; align-items: center; justify-content: center; }
+  .card.biz {
+    width: 100%; max-width: 420px; aspect-ratio: 1.586;
+    padding: 20px;
+    border: 1px solid $border-color-primary;
+    background:
+      radial-gradient(110% 100% at 0% 0%, rgba($primary-color, .18), transparent 60%),
+      linear-gradient(135deg, rgba($secondary-color, .12), rgba($accent-secondary-color, .10));
+    color: $text-color-primary;
+
+    .biz-name { font-size: 22px; font-weight: 900; }
+    .biz-role { font-weight: 700; margin-bottom: 10px; color: $text-color-primary; }
+    .biz-detail { font-size: 14px; color: $text-color-secondary; }
+  }
+
+  /* ===== Settings ===== */
+  .settings-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;
+  }
+  .setting {
+    border: 1px solid $border-color-primary;
+    background: $background-color-secondary;
+    border-radius: 14px; padding: 12px;
+  }
+  .setting-title { font-weight: 800; margin-bottom: 4px; color: $text-color-primary; }
+  .setting-desc { color: $text-color-secondary; margin-bottom: 10px; }
+  .toggle-row { display: flex; align-items: center; gap: 10px; }
+
+  .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+  .switch input { display: none; }
+  .slider {
+    position: absolute; cursor: pointer; inset: 0; border-radius: 999px;
+    background: rgba($text-color-secondary, .35); transition: background .2s ease;
+  }
+  .slider:before {
+    content: ""; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px;
+    background: $channel-text-color; border-radius: 999px; transition: transform .2s ease;
+  }
+  .switch input:checked + .slider { background: rgba($secondary-color, .85); }
+  .switch input:checked + .slider:before { transform: translateX(20px); }
+
+  /* ===== Skeleton ===== */
+  .profile-skeleton {
+    .skeleton {
+      background:
+        linear-gradient(90deg,
+          rgba($background-color-secondary, .8),
+          rgba($primary-color, .25),
+          rgba($background-color-secondary, .8));
+      background-size: 200% 100%; animation: shimmer 1.2s infinite;
+      border-radius: 12px; margin-bottom: 12px;
+      &.banner { height: 180px; }
+      &.row { height: 48px; }
+      &.block { height: 120px; }
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  }
+
+  /* ===== Responsiveness ===== */
+  @media (max-width: 800px) {
+    .about-grid, .biz-grid { grid-template-columns: 1fr; }
+    .profile-header-content {
+      grid-template-columns: auto 1fr;
+      .header-actions { grid-column: 1 / -1; justify-self: start; }
+    }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .form-row.two { grid-template-columns: 1fr; }
+  }
+}
