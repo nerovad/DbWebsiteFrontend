@@ -128,9 +128,15 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
       const res = await fetch("/api/channels", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),                          // <-- adds Authorization: Bearer <token>
+        credentials: "include" as RequestCredentials,    // (optional) if you also use cookies
         body: JSON.stringify(body),
       });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Failed to create channel: ${res.status} ${msg}`);
+      }
 
       if (res.ok) {
         const data = await res.json();

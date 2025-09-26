@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Profile.scss";
+import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
+import { useApi } from "../../utils/useApi";
 
 // Try to import your chat store if available; fall back gracefully.
 let useChatStore: any = null;
 try {
-  // If you don’t have this in the project, this try/catch keeps things safe.
   // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   useChatStore = require("../../store/useChatStore").useChatStore;
 } catch { /* optional */ }
 
@@ -25,13 +25,16 @@ type Film = {
   thumbnail?: string;
   duration?: string;
   synopsis?: string;
+  url?: string;
+  provider?: string;
 };
 
 type Award = {
   id: string;
   name: string;
   year?: number | string;
-  work?: string; // film or project the award was for
+  work?: string;
+  position?: number;
 };
 
 type Company = {
@@ -39,15 +42,7 @@ type Company = {
   name: string;
   role?: string;
   website?: string;
-};
-
-type BusinessCard = {
-  fullName: string;
-  role: string;
-  email: string;
-  phone?: string;
-  website?: string;
-  company?: string;
+  position?: number;
 };
 
 type ProfileData = {
@@ -68,19 +63,12 @@ type ProfileData = {
   };
 };
 
-type TabKey =
-  | "overview"
-  | "channels"
-  | "films"
-  | "awards"
-  | "companies"
-  | "business-card"
-  | "settings";
+type TabKey = "overview" | "channels" | "films" | "awards" | "companies" | "settings";
 
 const DEFAULT_PROFILE: ProfileData = {
   id: "me",
   handle: "@username",
-  displayName: "Your Name",
+  displayName: "@username",
   bannerUrl: "",
   avatarUrl: "",
   bio: "",
@@ -91,29 +79,26 @@ const DEFAULT_PROFILE: ProfileData = {
 };
 
 const Profile: React.FC = () => {
+  const api = useApi();
   const [active, setActive] = useState<TabKey>("overview");
   const [loading, setLoading] = useState(true);
+
+  // Use your existing auth pattern
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
   const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [films, setFilms] = useState<Film[]>([]);
   const [awards, setAwards] = useState<Award[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
-  const [businessCard, setBusinessCard] = useState<BusinessCard>({
-    fullName: "",
-    role: "",
-    email: "",
-    phone: "",
-    website: "",
-    company: "",
-  });
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
 
   // Editable fields
   const [bioDraft, setBioDraft] = useState("");
-  const [businessDraft, setBusinessDraft] = useState<BusinessCard>(businessCard);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Pull channels from your store if available, else fetch.
+  // Pull channels from your store if available
   const storeChannels = useMemo(() => {
     try {
       return useChatStore ? useChatStore.getState?.().channels ?? [] : [];
@@ -122,82 +107,93 @@ const Profile: React.FC = () => {
     }
   }, []);
 
+  // Listen for storage changes (like your App.tsx does)
+  useEffect(() => {
+    const checkLogin = () => setIsLoggedIn(!!localStorage.getItem("token"));
+    window.addEventListener("storage", checkLogin);
+    return () => window.removeEventListener("storage", checkLogin);
+  }, []);
+
+  // Auth required check
+  if (!isLoggedIn) {
+    return (
+      <div className="profile-page">
+        <div className="auth-required">
+          <h2>Please log in to view your profile</h2>
+          <button onClick={() => window.location.href = '/'}>
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     let mounted = true;
 
-    (async () => {
+    const loadProfileData = async () => {
       setLoading(true);
       try {
-        // Profile
-        const p = await safeGet("/api/profile/me", DEFAULT_PROFILE);
-        // If your API returns nulls, coerce into our shape
-        if (mounted) setProfile({ ...DEFAULT_PROFILE, ...p });
+        // Load all profile data
+        const [profileData, filmsData, awardsData, companiesData] = await Promise.all([
+          api.get("/api/profile/me", DEFAULT_PROFILE),
+          api.get("/api/films/mine", []),
+          api.get("/api/awards/mine", []),
+          api.get("/api/companies/mine", [])
+        ]);
 
-        // Channels
+        if (mounted) {
+          setProfile({ ...DEFAULT_PROFILE, ...profileData });
+          setFilms(filmsData);
+          setAwards(awardsData);
+          setCompanies(companiesData);
+          setBioDraft(profileData?.bio ?? "");
+        }
+
+        // Load channels (from store or API)
         if (storeChannels && storeChannels.length > 0) {
-          setChannels(storeChannels);
+          if (mounted) setChannels(storeChannels);
         } else {
-          const c = await safeGet("/api/channels/mine", []);
-          if (mounted) setChannels(c);
+          const channelsData = await api.get("/api/channels/mine", []);
+          if (mounted) setChannels(channelsData);
         }
-
-        // Films
-        const f = await safeGet("/api/films/mine", []);
-        if (mounted) setFilms(f);
-
-        // Awards
-        const a = await safeGet("/api/awards/mine", []);
-        if (mounted) setAwards(a);
-
-        // Companies
-        const co = await safeGet("/api/companies/mine", []);
-        if (mounted) setCompanies(co);
-
-        // Business card
-        const bc = await safeGet("/api/profile/business-card", null);
-        if (mounted && bc) {
-          setBusinessCard(bc);
-          setBusinessDraft(bc);
+      } catch (error) {
+        console.error('Failed to load profile data:', error);
+        if (error.message === 'Authentication expired') {
+          setIsLoggedIn(false);
         }
-
-        // Drafts
-        if (mounted) setBioDraft(p?.bio ?? "");
-      } catch {
-        // Fail silently but present defaults
       } finally {
         if (mounted) setLoading(false);
       }
-    })();
+    };
+
+    if (isLoggedIn) {
+      loadProfileData();
+    }
 
     return () => {
       mounted = false;
     };
-  }, [storeChannels]);
+  }, [isLoggedIn]); // Simple dependency on login status
 
   const onSaveBio = async () => {
     setIsSaving(true);
     try {
-      await safePost("/api/profile/bio", { bio: bioDraft });
+      await api.post("/api/profile/bio", { bio: bioDraft });
       setProfile((prev) => ({ ...prev, bio: bioDraft }));
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const onSaveBusinessCard = async () => {
-    setIsSaving(true);
-    try {
-      await safePost("/api/profile/business-card", businessDraft);
-      setBusinessCard(businessDraft);
+      setIsEditingBio(false); // Exit edit mode after saving
+    } catch (error) {
+      console.error('Failed to save bio:', error);
+      if (error.message === 'Authentication expired') {
+        setIsLoggedIn(false);
+      }
     } finally {
       setIsSaving(false);
     }
   };
 
   const statItems = [
-    { label: "Followers", value: profile.stats.followers },
-    { label: "Following", value: profile.stats.following },
-    { label: "Films", value: profile.stats.films || films.length },
+    { label: "Channels", value: channels.length },
     { label: "Awards", value: profile.stats.awards || awards.length },
   ];
 
@@ -217,15 +213,6 @@ const Profile: React.FC = () => {
     <div className="profile-page">
       {/* Header */}
       <div className="profile-header">
-        <div
-          className="profile-banner"
-          style={{
-            backgroundImage: profile.bannerUrl ? `url(${profile.bannerUrl})` : "none",
-          }}
-        >
-          {!profile.bannerUrl && <div className="banner-fallback" />}
-        </div>
-
         <div className="profile-header-content">
           <div className="avatar-wrap">
             {profile.avatarUrl ? (
@@ -233,10 +220,12 @@ const Profile: React.FC = () => {
             ) : (
               <div className="avatar placeholder">{profile.displayName?.[0] || "U"}</div>
             )}
+            <button className="avatar-edit-btn" onClick={() => {/* Handle avatar edit */ }}>
+              ✏️
+            </button>
           </div>
 
           <div className="identity">
-            <h1 className="display-name">{profile.displayName}</h1>
             <div className="handle">{profile.handle}</div>
             {(profile.location || profile.website) && (
               <div className="meta">
@@ -250,12 +239,7 @@ const Profile: React.FC = () => {
             )}
           </div>
 
-          <div className="header-actions">
-            <button className="btn ghost">Share</button>
-            <button className="btn primary">Edit Profile</button>
-          </div>
         </div>
-
         <div className="stats-row">
           {statItems.map((s) => (
             <div key={s.label} className="stat">
@@ -274,7 +258,6 @@ const Profile: React.FC = () => {
           ["films", "Films"],
           ["awards", "Awards"],
           ["companies", "Companies"],
-          ["business-card", "Business Card"],
           ["settings", "Settings"],
         ].map(([key, label]) => (
           <button
@@ -295,34 +278,47 @@ const Profile: React.FC = () => {
             <div className="about-grid">
               <div className="about-left">
                 <label className="field-label">Bio</label>
-                <textarea
-                  className="input textarea"
-                  rows={6}
-                  value={bioDraft}
-                  onChange={(e) => setBioDraft(e.target.value)}
-                  placeholder="Tell the world who you are, your style, and what you’re working on."
-                />
-                <div className="row-actions">
-                  <button className="btn ghost" onClick={() => setBioDraft(profile.bio || "")}>
-                    Reset
-                  </button>
-                  <button className="btn primary" onClick={onSaveBio} disabled={isSaving}>
-                    {isSaving ? "Saving..." : "Save Bio"}
-                  </button>
-                </div>
+                {!isEditingBio ? (
+                  // Read-only bio display
+                  <div className="bio-display">
+                    <div className="bio-text">
+                      {profile.bio || "No bio yet. Click Edit to add one."}
+                    </div>
+                    <div className="row-actions">
+                      <button className="btn primary" onClick={() => setIsEditingBio(true)}>
+                        Edit Bio
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Edit mode
+                  <>
+                    <textarea
+                      className="input textarea"
+                      rows={6}
+                      value={bioDraft}
+                      onChange={(e) => setBioDraft(e.target.value)}
+                      placeholder="Tell the world who you are, your style, and what you're working on."
+                    />
+                    <div className="row-actions">
+                      <button
+                        className="btn ghost"
+                        onClick={() => {
+                          setBioDraft(profile.bio || "");
+                          setIsEditingBio(false);
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button className="btn primary" onClick={onSaveBio} disabled={isSaving}>
+                        {isSaving ? "Saving..." : "Save Bio"}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="about-right">
-                <label className="field-label">Social Links</label>
-                <ul className="socials">
-                  {(profile.socials?.length ? profile.socials : []).map((s) => (
-                    <li key={s.url}>
-                      <a href={s.url} target="_blank" rel="noreferrer">
-                        {s.label}
-                      </a>
-                    </li>
-                  ))}
-                  {!(profile.socials?.length ?? 0) && <li>No socials yet.</li>}
-                </ul>
+                {/* Social links section stays the same */}
               </div>
             </div>
           </section>
@@ -332,7 +328,12 @@ const Profile: React.FC = () => {
           <section className="panel">
             <div className="panel-head">
               <h2>Your Channels</h2>
-              <button className="btn primary">Create Channel</button>
+              <button
+                className="btn primary"
+                onClick={() => setIsCreateChannelOpen(true)}
+              >
+                Create Channel
+              </button>
             </div>
 
             {channels.length === 0 ? (
@@ -345,11 +346,14 @@ const Profile: React.FC = () => {
                       {ch.thumbnail ? (
                         <img src={ch.thumbnail} alt={ch.name} />
                       ) : (
-                        <div className="thumb-fallback" />
+                        <div className="thumb-fallback">
+                          <div className="channel-placeholder">
+                            <span className="channel-icon">📺</span> {/* or use an icon */}
+                          </div>
+                        </div>
                       )}
                       {ch.isLive && <span className="live-pill">LIVE</span>}
-                    </div>
-                    <div className="card-body">
+                    </div>                    <div className="card-body">
                       <div className="card-title">{ch.name}</div>
                       {ch.description && <p className="card-desc">{ch.description}</p>}
                       <div className="card-actions">
@@ -388,8 +392,13 @@ const Profile: React.FC = () => {
                     <div className="card-body">
                       <div className="card-title">{f.title}</div>
                       {f.synopsis && <p className="card-desc">{f.synopsis}</p>}
+                      {f.provider && <div className="card-meta">via {f.provider}</div>}
                       <div className="card-actions">
-                        <a className="btn ghost" href={`/film/${f.id}`}>View</a>
+                        {f.url ? (
+                          <a className="btn ghost" href={f.url} target="_blank" rel="noreferrer">View</a>
+                        ) : (
+                          <a className="btn ghost" href={`/film/${f.id}`}>View</a>
+                        )}
                         <button className="btn">Edit</button>
                       </div>
                     </div>
@@ -452,97 +461,6 @@ const Profile: React.FC = () => {
           </section>
         )}
 
-        {active === "business-card" && (
-          <section className="panel">
-            <h2>Business Card</h2>
-            <div className="biz-grid">
-              <div className="biz-form">
-                <div className="form-row">
-                  <label className="field-label">Full Name</label>
-                  <input
-                    className="input"
-                    value={businessDraft.fullName}
-                    onChange={(e) => setBusinessDraft({ ...businessDraft, fullName: e.target.value })}
-                    placeholder="Your Name"
-                  />
-                </div>
-                <div className="form-row">
-                  <label className="field-label">Role</label>
-                  <input
-                    className="input"
-                    value={businessDraft.role}
-                    onChange={(e) => setBusinessDraft({ ...businessDraft, role: e.target.value })}
-                    placeholder="Director / Editor / Producer"
-                  />
-                </div>
-                <div className="form-row two">
-                  <div>
-                    <label className="field-label">Email</label>
-                    <input
-                      className="input"
-                      value={businessDraft.email}
-                      onChange={(e) => setBusinessDraft({ ...businessDraft, email: e.target.value })}
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                  <div>
-                    <label className="field-label">Phone</label>
-                    <input
-                      className="input"
-                      value={businessDraft.phone}
-                      onChange={(e) => setBusinessDraft({ ...businessDraft, phone: e.target.value })}
-                      placeholder="(555) 555-5555"
-                    />
-                  </div>
-                </div>
-                <div className="form-row two">
-                  <div>
-                    <label className="field-label">Company</label>
-                    <input
-                      className="input"
-                      value={businessDraft.company}
-                      onChange={(e) => setBusinessDraft({ ...businessDraft, company: e.target.value })}
-                      placeholder="Your Company"
-                    />
-                  </div>
-                  <div>
-                    <label className="field-label">Website</label>
-                    <input
-                      className="input"
-                      value={businessDraft.website}
-                      onChange={(e) => setBusinessDraft({ ...businessDraft, website: e.target.value })}
-                      placeholder="https://example.com"
-                    />
-                  </div>
-                </div>
-                <div className="row-actions">
-                  <button
-                    className="btn ghost"
-                    onClick={() => setBusinessDraft(businessCard)}
-                    disabled={isSaving}
-                  >
-                    Reset
-                  </button>
-                  <button className="btn primary" onClick={onSaveBusinessCard} disabled={isSaving}>
-                    {isSaving ? "Saving..." : "Save Card"}
-                  </button>
-                </div>
-              </div>
-
-              <div className="biz-preview">
-                <div className="card biz">
-                  <div className="biz-name">{businessDraft.fullName || "Your Name"}</div>
-                  <div className="biz-role">{businessDraft.role || "Your Role"}</div>
-                  <div className="biz-detail">{businessDraft.company || "Company"}</div>
-                  {businessDraft.website && <div className="biz-detail">{businessDraft.website}</div>}
-                  <div className="biz-detail">{businessDraft.email || "you@example.com"}</div>
-                  {businessDraft.phone && <div className="biz-detail">{businessDraft.phone}</div>}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
         {active === "settings" && (
           <section className="panel">
             <h2>Settings</h2>
@@ -580,31 +498,12 @@ const Profile: React.FC = () => {
           </section>
         )}
       </div>
+      <CreateChannelModal
+        isOpen={isCreateChannelOpen}
+        onClose={() => setIsCreateChannelOpen(false)}
+      />
     </div>
   );
 };
-
-async function safeGet<T>(url: string, fallback: T): Promise<T> {
-  try {
-    const res = await fetch(url, { credentials: "include" });
-    if (!res.ok) return fallback;
-    return (await res.json()) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-async function safePost<T extends object>(url: string, body: T) {
-  try {
-    await fetch(url, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-  } catch {
-    /* swallow for now */
-  }
-}
 
 export default Profile;

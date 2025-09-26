@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./store/AuthContext";
 import NavBar from "./components/Navigation/Navigation.tsx";
 import NewsTicker from "./components/NewsTicker/NewsTicker.tsx";
 import TvGuide from "./components/TvGuide/TvGuide.tsx";
@@ -110,47 +111,49 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Router>
-      <Routes>
-        {/* Main layout with video, chatbox, and sidebar */}
-        <Route
-          path="/"
-          element={
-            <MainLayout
-              isMenuOpen={isMenuOpen}
-              isChatOpen={isChatOpen}
-              setIsMenuOpen={setIsMenuOpen}
-              setIsChatOpen={setIsChatOpen}
-              isGuideOpen={isGuideOpen}
-              setIsGuideOpen={setIsGuideOpen}
-              isAuthOpen={isAuthOpen} // ✅ Pass Auth state
-              setIsAuthOpen={setIsAuthOpen}
-              authMode={authMode}
-              setAuthMode={setAuthMode}
-              isLoggedIn={isLoggedIn}
-              setIsLoggedIn={setIsLoggedIn}
-              videoControls={videoControls} // ✅ Pass video controls to MainLayout
-            />
-          }
-        />
-        <Route path="/upload" element={<Upload />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Main layout with video, chatbox, and sidebar */}
+          <Route
+            path="/"
+            element={
+              <MainLayout
+                isMenuOpen={isMenuOpen}
+                isChatOpen={isChatOpen}
+                setIsMenuOpen={setIsMenuOpen}
+                setIsChatOpen={setIsChatOpen}
+                isGuideOpen={isGuideOpen}
+                setIsGuideOpen={setIsGuideOpen}
+                isAuthOpen={isAuthOpen} // ✅ Pass Auth state
+                setIsAuthOpen={setIsAuthOpen}
+                authMode={authMode}
+                setAuthMode={setAuthMode}
+                isLoggedIn={isLoggedIn}
+                setIsLoggedIn={setIsLoggedIn}
+                videoControls={videoControls} // ✅ Pass video controls to MainLayout
+              />
+            }
+          />
+          <Route path="/upload" element={<Upload />} />
 
-        <Route path="/settings" element={<Settings />} />
+          <Route path="/settings" element={<Settings />} />
 
-        <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Profile />} />
 
-        <Route path="/admin/festivals" element={<AdminFestivals />} />
+          <Route path="/admin/festivals" element={<AdminFestivals />} />
 
-      </Routes>
-      {isAuthOpen && (
-        <Auth
-          setIsLoggedIn={setIsLoggedIn}
-          setIsAuthOpen={setIsAuthOpen}
-          authMode={authMode}
-          setAuthMode={setAuthMode}
-        />
-      )}
-    </Router>
+        </Routes>
+        {isAuthOpen && (
+          <Auth
+            setIsLoggedIn={setIsLoggedIn}
+            setIsAuthOpen={setIsAuthOpen}
+            authMode={authMode}
+            setAuthMode={setAuthMode}
+          />
+        )}
+      </Router>
+    </AuthProvider>
   );
 };
 
