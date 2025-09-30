@@ -141,7 +141,6 @@ const SearchNavBar: React.FC<NavBarProps> = ({
             {showDropdown && (
               <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
                 <Link to="/profile" className="profile-dropdown__item">Profile</Link>
-                <Link to="/settings" className="profile-dropdown__item">Settings</Link>
                 <button onClick={handleLogout} className="profile-dropdown__logout">Log out</button>
               </div>
             )}

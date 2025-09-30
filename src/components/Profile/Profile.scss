@@ -14,34 +14,34 @@
 
   /* ===== Header ===== */
   
-  .profile-header {
+ .profile-header {
   background: $background-color-primary;
   border: 1px solid $border-color-primary;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
-  padding: 32px 20px 16px; // Add top padding instead of banner space
+  padding: 32px 20px 16px;
+  text-align: center; // Center everything
 }
-
-// Remove the .profile-banner styles entirely
 
 .profile-header-content {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   margin-bottom: 20px;
 }
 
 .avatar-wrap { 
   position: relative; 
-  width: 120px; 
-  height: 120px; // Make it bigger since it's the focal point
+  width: 180px; 
+  height: 180px; // Much larger
 }
 
 .avatar {
-  width: 120px; 
-  height: 120px; 
-  border-radius: 50%;
+  width: 180px; 
+  height: 180px; 
+  border-radius: 24px; // Rounded square instead of circle
   border: 4px solid $background-color-primary;
   object-fit: cover;
 }
@@ -52,29 +52,28 @@
   background: $background-color-secondary; 
   color: $channel-text-color;
   font-weight: 800; 
-  font-size: 48px; // Bigger font for larger avatar
-  width: 120px; 
-  height: 120px; 
-  border-radius: 50%;
+  font-size: 64px; // Bigger font for larger avatar
+  width: 180px; 
+  height: 180px; 
+  border-radius: 24px; // Rounded square
   border: 4px solid $background-color-primary;
 }
 
-// Add edit button for avatar
 .avatar-edit-btn {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
+  bottom: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: $primary-color;
-  border: 2px solid $background-color-primary;
+  border: 3px solid $background-color-primary;
   color: $channel-text-color;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   transition: all 0.2s ease;
   
   &:hover {
@@ -84,19 +83,27 @@
 }
 
 .identity {
-  flex: 1; // Take up remaining space
+  text-align: center; // Center the text content
   
   .handle { 
     color: $text-color-secondary; 
-    margin-bottom: 8px; 
-    font-size: 18px;
+    margin-bottom: 12px; 
+    font-size: 20px; // Slightly larger since it's more prominent
     font-weight: 700;
   }
-  // ... rest of identity styles
+  
+  .meta {
+    display: flex; 
+    gap: 8px; 
+    flex-wrap: wrap;
+    justify-content: center; // Center the chips
+  }
 }
 
 .header-actions {
-  // Remove justify-self and align-self since we're using flexbox now
+  display: flex; 
+  gap: 12px; 
+  justify-content: center; // Center the action buttons
 }
 
   .btn {

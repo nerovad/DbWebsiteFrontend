@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Profile.scss";
+import AvatarPicker from "./AvatarPicker";
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 import { useApi } from "../../utils/useApi";
 
@@ -93,6 +94,7 @@ const Profile: React.FC = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   // Editable fields
   const [bioDraft, setBioDraft] = useState("");
@@ -106,6 +108,15 @@ const Profile: React.FC = () => {
       return [];
     }
   }, []);
+
+  const handleAvatarSelect = async (avatarUrl: string) => {
+    try {
+      await api.post("/api/profile/avatar", { avatarUrl });
+      setProfile(prev => ({ ...prev, avatarUrl }));
+    } catch (error) {
+      console.error('Failed to update avatar:', error);
+    }
+  };
 
   // Listen for storage changes (like your App.tsx does)
   useEffect(() => {
@@ -220,7 +231,10 @@ const Profile: React.FC = () => {
             ) : (
               <div className="avatar placeholder">{profile.displayName?.[0] || "U"}</div>
             )}
-            <button className="avatar-edit-btn" onClick={() => {/* Handle avatar edit */ }}>
+            <button
+              className="avatar-edit-btn"
+              onClick={() => setShowAvatarPicker(true)}
+            >
               ✏️
             </button>
           </div>
@@ -255,9 +269,7 @@ const Profile: React.FC = () => {
         {[
           ["overview", "Overview"],
           ["channels", "Channels"],
-          ["films", "Films"],
           ["awards", "Awards"],
-          ["companies", "Companies"],
           ["settings", "Settings"],
         ].map(([key, label]) => (
           <button
@@ -373,47 +385,10 @@ const Profile: React.FC = () => {
           </section>
         )}
 
-        {active === "films" && (
-          <section className="panel">
-            <div className="panel-head">
-              <h2>Your Films</h2>
-              <button className="btn primary">Upload Film</button>
-            </div>
-            {films.length === 0 ? (
-              <p className="muted">No films yet. Upload your first film!</p>
-            ) : (
-              <div className="card-grid">
-                {films.map((f) => (
-                  <div className="card film" key={f.id}>
-                    <div className="thumb">
-                      {f.thumbnail ? <img src={f.thumbnail} alt={f.title} /> : <div className="thumb-fallback" />}
-                      {f.duration && <span className="duration">{f.duration}</span>}
-                    </div>
-                    <div className="card-body">
-                      <div className="card-title">{f.title}</div>
-                      {f.synopsis && <p className="card-desc">{f.synopsis}</p>}
-                      {f.provider && <div className="card-meta">via {f.provider}</div>}
-                      <div className="card-actions">
-                        {f.url ? (
-                          <a className="btn ghost" href={f.url} target="_blank" rel="noreferrer">View</a>
-                        ) : (
-                          <a className="btn ghost" href={`/film/${f.id}`}>View</a>
-                        )}
-                        <button className="btn">Edit</button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
-        )}
-
         {active === "awards" && (
           <section className="panel">
             <div className="panel-head">
               <h2>Awards</h2>
-              <button className="btn">Add Award</button>
             </div>
             {awards.length === 0 ? (
               <p className="muted">No awards yet. Start submitting your films to win!</p>
@@ -425,34 +400,6 @@ const Profile: React.FC = () => {
                     <div className="award-meta">
                       {a.work && <span className="chip">{a.work}</span>}
                       {a.year && <span className="chip">{a.year}</span>}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        )}
-
-        {active === "companies" && (
-          <section className="panel">
-            <div className="panel-head">
-              <h2>Production Companies</h2>
-              <button className="btn">Add Company</button>
-            </div>
-            {companies.length === 0 ? (
-              <p className="muted">List your production companies here.</p>
-            ) : (
-              <ul className="list companies">
-                {companies.map((c) => (
-                  <li key={c.id} className="list-item">
-                    <div className="company-name">{c.name}</div>
-                    <div className="company-meta">
-                      {c.role && <span className="chip">{c.role}</span>}
-                      {c.website && (
-                        <a className="chip link" href={c.website} target="_blank" rel="noreferrer">
-                          Website
-                        </a>
-                      )}
                     </div>
                   </li>
                 ))}
@@ -479,7 +426,7 @@ const Profile: React.FC = () => {
 
               <div className="setting">
                 <div className="setting-title">Email Notifications</div>
-                <div className="setting-desc">New followers, comments, and festival updates.</div>
+                <div className="setting-desc">New messages, festival updates, no spam.</div>
                 <div className="toggle-row">
                   <label className="switch">
                     <input type="checkbox" defaultChecked />
@@ -488,12 +435,6 @@ const Profile: React.FC = () => {
                   <span>Send me updates</span>
                 </div>
               </div>
-
-              <div className="setting">
-                <div className="setting-title">Two-Factor Auth</div>
-                <div className="setting-desc">Keep your account secure.</div>
-                <button className="btn">Configure</button>
-              </div>
             </div>
           </section>
         )}
@@ -501,6 +442,13 @@ const Profile: React.FC = () => {
       <CreateChannelModal
         isOpen={isCreateChannelOpen}
         onClose={() => setIsCreateChannelOpen(false)}
+      />
+
+      <AvatarPicker
+        isOpen={showAvatarPicker}
+        onClose={() => setShowAvatarPicker(false)}
+        onSelect={handleAvatarSelect}
+        currentAvatar={profile.avatarUrl}
       />
     </div>
   );

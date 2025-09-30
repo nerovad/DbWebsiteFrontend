@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./store/AuthContext";
 import NavBar from "./components/Navigation/Navigation.tsx";
 import NewsTicker from "./components/NewsTicker/NewsTicker.tsx";
@@ -15,7 +15,6 @@ import AdminFestivals from "./components/Pages/AdminFestivals.tsx";
 import CreateChannelForm from "./components/Channel/CreateChannelForm";
 import "./App.scss";
 
-
 const MainLayout: React.FC<{
   isMenuOpen: boolean;
   isChatOpen: boolean;
@@ -25,11 +24,12 @@ const MainLayout: React.FC<{
   setIsGuideOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-  videoControls: any; // ✅ Added video controls prop
+  videoControls: any;
   isAuthOpen: boolean;
   setIsAuthOpen: React.Dispatch<React.SetStateAction<boolean>>;
   authMode: "login" | "register";
   setAuthMode: React.Dispatch<React.SetStateAction<"login" | "register">>;
+  channelSlug?: string; // ✅ New prop for channel routing
 }> = ({
   isMenuOpen,
   isChatOpen,
@@ -39,11 +39,12 @@ const MainLayout: React.FC<{
   setIsGuideOpen,
   isLoggedIn,
   setIsLoggedIn,
-  videoControls, // ✅ Receive video controls
+  videoControls,
   isAuthOpen,
   setIsAuthOpen,
   authMode,
-  setAuthMode
+  setAuthMode,
+  channelSlug
 }) => (
     <>
       <NavBar
@@ -52,7 +53,7 @@ const MainLayout: React.FC<{
         setIsGuideOpen={setIsGuideOpen}
         setIsAuthOpen={setIsAuthOpen}
         setAuthMode={setAuthMode}
-        {...videoControls} // ✅ Pass video controls to NavBar
+        {...videoControls}
       />
       <div className="main-content">
         <Channels isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
@@ -62,14 +63,13 @@ const MainLayout: React.FC<{
           isChatOpen={isChatOpen}
           setIsGuideOpen={setIsGuideOpen}
           setVideoControls={videoControls.setVideoControls}
+          channelSlug={channelSlug} // ✅ Pass channel slug to VideoPlayer
         />
         <Chatbox isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
       </div>
       <NewsTicker />
 
       {isGuideOpen && <TvGuide isOpen={isGuideOpen} closeGuide={() => setIsGuideOpen(false)} />}
-
-
     </>
   );
 
@@ -79,11 +79,8 @@ const App: React.FC = () => {
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
 
-  // ✅ Auth Modal State (Fixing Hook Error)
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
-
-  // ✅ Video State (Received from VideoPlayer.tsx)
 
   const [videoControls, setVideoControls] = useState<any>({
     currentIndex: 0,
@@ -95,16 +92,12 @@ const App: React.FC = () => {
     toggleMute: () => { },
     toggleFullscreen: () => { },
     loadVideo: () => { },
-    setVideoControls: (controls: any) => setVideoControls((prev) => ({ ...prev, ...controls })), // ✅ Persist state updates
+    setVideoControls: (controls: any) => setVideoControls((prev) => ({ ...prev, ...controls })),
   });
 
-
-  // ✅ Listen for changes in localStorage
   useEffect(() => {
     const checkLogin = () => setIsLoggedIn(!!localStorage.getItem("token"));
-
     window.addEventListener("storage", checkLogin);
-
     return () => {
       window.removeEventListener("storage", checkLogin);
     };
@@ -114,9 +107,12 @@ const App: React.FC = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Main layout with video, chatbox, and sidebar */}
+          {/* Redirect root to default channel */}
+          <Route path="/" element={<Navigate to="/channel/channel-0" replace />} />
+
+          {/* Channel-specific route */}
           <Route
-            path="/"
+            path="/channel/:channelSlug"
             element={
               <MainLayout
                 isMenuOpen={isMenuOpen}
@@ -125,25 +121,28 @@ const App: React.FC = () => {
                 setIsChatOpen={setIsChatOpen}
                 isGuideOpen={isGuideOpen}
                 setIsGuideOpen={setIsGuideOpen}
-                isAuthOpen={isAuthOpen} // ✅ Pass Auth state
+                isAuthOpen={isAuthOpen}
                 setIsAuthOpen={setIsAuthOpen}
                 authMode={authMode}
                 setAuthMode={setAuthMode}
                 isLoggedIn={isLoggedIn}
                 setIsLoggedIn={setIsLoggedIn}
-                videoControls={videoControls} // ✅ Pass video controls to MainLayout
+                videoControls={videoControls}
+                channelSlug={undefined} // Will be extracted in VideoPlayer via useParams
               />
             }
           />
+
+          {/* Other routes */}
           <Route path="/upload" element={<Upload />} />
-
           <Route path="/settings" element={<Settings />} />
-
           <Route path="/profile" element={<Profile />} />
-
           <Route path="/admin/festivals" element={<AdminFestivals />} />
 
+          {/* Catch-all redirect */}
+          <Route path="*" element={<Navigate to="/channel/channel-0" replace />} />
         </Routes>
+
         {isAuthOpen && (
           <Auth
             setIsLoggedIn={setIsLoggedIn}

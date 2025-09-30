@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Hls from "hls.js";
 import "./VideoPlayer.scss";
 import Chatbox from "../Chatbox/Chatbox";
@@ -22,16 +23,20 @@ interface VideoPlayerProps {
     toggleFullscreen: () => void;
     loadVideo: (src: string) => void;
   }) => void;
+  channelSlug?: string;
 }
 
-const HLS_BASE = "https://dainbramage.tv:8088"; // nested style: /hls/<key>/<key>.m3u8
+const HLS_BASE = "https://dainbramage.tv:8088";
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVideoControls }) => {
+  const { channelSlug } = useParams<{ channelSlug: string }>();
+  const navigate = useNavigate();
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<Hls | null>(null);
   const endedListenerRef = useRef<(() => void) | null>(null);
-  const switchingRef = useRef(false);     // debounce switches
-  const retryRef = useRef(0);             // hls retry counter
+  const switchingRef = useRef(false);
+  const retryRef = useRef(0);
 
   const { setChannelId } = useChatStore();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -39,11 +44,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
   const [isMuted, setIsMuted] = useState(true);
   const [showMuteIcon, setShowMuteIcon] = useState(false);
   const [videoLinks, setVideoLinks] = useState<VideoLink[]>([
-    // Always index 0 = local color bars fallback
     { src: "/videos/Color_Bars_DB_Web.mp4", channel: "channel-0", isLive: false },
   ]);
 
-  // --- helpers ---
   const getClassNames = () => {
     let classNames = "";
     if (isMenuOpen) classNames += " expanded-left";
@@ -73,28 +76,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
   const attachEndedForMp4 = () => {
     const v = videoRef.current;
     if (!v) return;
-    const onEnded = () => goToNextVideo(); // only for VOD/mp4
+    const onEnded = () => goToNextVideo();
     v.addEventListener("ended", onEnded);
     endedListenerRef.current = () => v.removeEventListener("ended", onEnded);
   };
 
-  // --- loadVideo with robust HLS handling ---
   const loadVideo = useCallback((src: string) => {
     const v = videoRef.current;
     if (!v) return;
 
     cleanupHls();
 
-    // MP4
     if (src.endsWith(".mp4")) {
       v.src = src;
       attachEndedForMp4();
-      v.muted = true; // browsers require muted autoplay
+      v.muted = true;
       v.play().catch(() => { });
       return;
     }
 
-    // HLS
     if (Hls.isSupported()) {
       const hls = new Hls({
         liveBackBufferLength: 0,
@@ -106,11 +106,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
       });
 
       hlsRef.current = hls;
-
       hls.loadSource(src);
       hls.attachMedia(v);
 
-      // Correct event names
       hls.on("manifestParsed", () => {
         v.muted = true;
         v.play().catch(() => { });
@@ -118,7 +116,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
 
       hls.on("error", (_evt: any, data: any) => {
         const fatal = !!data?.fatal;
-        const type = data?.type as string | undefined; // 'networkError' | 'mediaError' | etc.
+        const type = data?.type as string | undefined;
         if (!fatal) return;
 
         if (type === "networkError") {
@@ -142,7 +140,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
       return;
     }
 
-    // Safari (native HLS)
     const vtag = videoRef.current;
     if (vtag?.canPlayType("application/vnd.apple.mpegurl")) {
       vtag.src = src;
@@ -154,30 +151,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
     console.error("This browser cannot play HLS.");
   }, []);
 
-  // --- channel switchers (debounced) ---
+  // ✅ Navigate to new channel URL
   const switchToIndex = (idx: number) => {
     if (switchingRef.current) return;
     switchingRef.current = true;
 
     const safeIdx = ((idx % videoLinks.length) + videoLinks.length) % videoLinks.length;
-    setCurrentIndex(safeIdx);
-
     const dest = videoLinks[safeIdx];
-    setChannelName(dest.channel);
-    loadVideo(dest.src);
 
-    setChannelId(dest.channel);
+    // ✅ Update URL instead of just state
+    navigate(`/channel/${dest.channel}`, { replace: true });
 
     setTimeout(() => {
       switchingRef.current = false;
-      setTimeout(() => setChannelName(""), 7000);
     }, 200);
   };
 
   const goToNextVideo = useCallback(() => switchToIndex(currentIndex + 1), [currentIndex, videoLinks.length]);
   const goToPreviousVideo = useCallback(() => switchToIndex(currentIndex - 1), [currentIndex, videoLinks.length]);
 
-  // --- mute/fullscreen ---
   const toggleMute = () => {
     const v = videoRef.current;
     if (!v) return;
@@ -195,7 +187,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
     else document.exitFullscreen().catch(() => { });
   };
 
-  // --- first mount: show mute badge briefly ---
   useEffect(() => {
     const v = videoRef.current;
     if (v?.muted) {
@@ -204,7 +195,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
     }
   }, []);
 
-  // --- fetch channels dynamically (keeps your color bars at index 0) ---
+  // ✅ Fetch channels
   useEffect(() => {
     let alive = true;
 
@@ -213,7 +204,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
         const res = await fetch("/api/channels");
         const channels = await res.json();
 
-        // Build nested-style URLs: /hls/<key>/<key>.m3u8
         const dynamic: VideoLink[] = channels
           .map((ch: any) => {
             const key = ch.stream_key ?? ch.slug ?? ch.key;
@@ -234,19 +224,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
     return () => { alive = false; };
   }, []);
 
-  // --- load stream whenever currentIndex or list changes ---
+  // ✅ Sync URL parameter to video player state
   useEffect(() => {
-    const link = videoLinks[currentIndex];
-    if (!link) return;
-    loadVideo(link.src);
-    setChannelId(link.channel);
-    setChannelName(link.channel);
-    const hide = setTimeout(() => setChannelName(""), 7000);
-    return () => clearTimeout(hide);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, videoLinks]);
+    if (!channelSlug || videoLinks.length === 0) return;
 
-  // --- provide controls to NavBar (as before) ---
+    const idx = videoLinks.findIndex(link => link.channel === channelSlug);
+    if (idx !== -1 && idx !== currentIndex) {
+      setCurrentIndex(idx);
+      const link = videoLinks[idx];
+      loadVideo(link.src);
+      setChannelId(link.channel);
+      setChannelName(link.channel);
+
+      const hide = setTimeout(() => setChannelName(""), 7000);
+      return () => clearTimeout(hide);
+    }
+  }, [channelSlug, videoLinks]);
+
+  // ✅ Provide controls to NavBar
   useEffect(() => {
     setVideoControls({
       currentIndex,
@@ -259,10 +254,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
       toggleFullscreen,
       loadVideo,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, videoLinks]);
 
-  // --- keyboard shortcuts + right-click prev (cleanly mounted once) ---
+  // ✅ Keyboard shortcuts
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       const el = document.activeElement as HTMLElement | null;
@@ -282,10 +276,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
       document.removeEventListener("keydown", handleKey);
       document.removeEventListener("contextmenu", handleRightClick);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goToNextVideo, goToPreviousVideo]);
 
-  // --- unmount cleanup ---
   useEffect(() => () => cleanupHls(), []);
 
   return (
