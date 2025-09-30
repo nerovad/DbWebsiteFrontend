@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle, FaVolumeMute, FaExpand } from "react-icons/fa";
+import { FaUserCircle, FaVolumeMute, FaExpand, FaTv } from "react-icons/fa";
 import Logo from "../../assets/cinezoo_Logo_V3.png";
 import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import "./Navigation.scss";
@@ -81,13 +81,12 @@ const SearchNavBar: React.FC<NavBarProps> = ({
           Ch+
         </button>
 
-        <a
-          href="#"
-          className="search-navbar__link"
+        <button
+          className="search-navbar__tv-guide-button"
           onClick={(e) => { e.preventDefault(); setIsGuideOpen?.((prev) => !prev); }}
         >
-          <img src={TvGuideIcon} alt="TV Guide" />
-        </a>
+          <FaTv size={20} />
+        </button>
 
         <div className="search-navbar__channel-input-container">
           <input

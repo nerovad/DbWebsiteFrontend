@@ -104,7 +104,8 @@
 
   // Mute and Fullscreen Buttons
   .mute-button,
-  .fullscreen-button {
+  .fullscreen-button, 
+  &__tv-guide-button {
     background-color: transparent;
     border: none;
     color: $text-color-secondary;
