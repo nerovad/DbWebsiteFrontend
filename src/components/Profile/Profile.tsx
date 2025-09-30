@@ -3,6 +3,7 @@ import "./Profile.scss";
 import AvatarPicker from "./AvatarPicker";
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 import { useApi } from "../../utils/useApi";
+import Logo from "../../assets/cinezoo_Logo_V3.png";
 
 // Try to import your chat store if available; fall back gracefully.
 let useChatStore: any = null;
@@ -225,6 +226,11 @@ const Profile: React.FC = () => {
       {/* Header */}
       <div className="profile-header">
         <div className="profile-header-content">
+          <div className="profile-home-button">
+            <a href="/">
+              <img src={Logo} alt="Cinezoo" className="profile-home-logo" />
+            </a>
+          </div>
           <div className="avatar-wrap">
             {profile.avatarUrl ? (
               <img className="avatar" src={profile.avatarUrl} alt="Avatar" />
