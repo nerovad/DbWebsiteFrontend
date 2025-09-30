@@ -80,6 +80,15 @@ const SearchNavBar: React.FC<NavBarProps> = ({
         <button className="channel-button" onClick={goToNextVideo}>
           Ch+
         </button>
+
+        <a
+          href="#"
+          className="search-navbar__link"
+          onClick={(e) => { e.preventDefault(); setIsGuideOpen?.((prev) => !prev); }}
+        >
+          <img src={TvGuideIcon} alt="TV Guide" />
+        </a>
+
         <div className="search-navbar__channel-input-container">
           <input
             type="text"
@@ -107,13 +116,6 @@ const SearchNavBar: React.FC<NavBarProps> = ({
 
       {/* Right Links & Profile/Login */}
       <div className="search-navbar__links">
-        <a
-          href="#"
-          className="search-navbar__link"
-          onClick={(e) => { e.preventDefault(); setIsGuideOpen?.((prev) => !prev); }}
-        >
-          <img src={TvGuideIcon} alt="TV Guide" />
-        </a>
 
         {/* ⬇️ New Create Channel button */}
         {isLoggedIn && (

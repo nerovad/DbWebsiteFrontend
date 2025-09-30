@@ -171,7 +171,7 @@ const Profile: React.FC = () => {
         }
       } catch (error) {
         console.error('Failed to load profile data:', error);
-        if (error.message === 'Authentication expired') {
+        if (error instanceof Error && error.message === 'Authentication expired') {
           setIsLoggedIn(false);
         }
       } finally {
@@ -196,7 +196,7 @@ const Profile: React.FC = () => {
       setIsEditingBio(false); // Exit edit mode after saving
     } catch (error) {
       console.error('Failed to save bio:', error);
-      if (error.message === 'Authentication expired') {
+      if (error instanceof Error && error.message === 'Authentication expired') {
         setIsLoggedIn(false);
       }
     } finally {
