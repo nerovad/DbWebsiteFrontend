@@ -1,5 +1,4 @@
 @use "../../styles/_variables.scss" as *;
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 .tv-guide-overlay {
@@ -8,7 +7,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6); // You could replace with a variable if you want a custom overlay shade
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
@@ -16,7 +15,7 @@
   z-index: 10001;
   font-family: $primary-font-family;
   color: $primary-color;
-  text-shadow: 2px 2px 5px rgba($accent-secondary-color, 0.2); // ✅ using accent-secondary instead of hardcoded yellow
+  text-shadow: 2px 2px 5px rgba($accent-secondary-color, 0.2);
 
   .tv-guide-content {
     width: 80%;
@@ -37,10 +36,11 @@
       width: 100%;
       height: 100%;
       background: repeating-linear-gradient(
-        rgba($primary-color, 0.03) 0px, // ✅ correct scanline color
+        rgba($primary-color, 0.03) 0px,
         rgba($accent-secondary-color, 0.02) 3px
       );
       pointer-events: none;
+      border-radius: 10px;
     }
   }
 
@@ -49,45 +49,112 @@
     text-align: center;
     margin-bottom: 15px;
     color: $secondary-color;
+    position: relative;
+    z-index: 1;
   }
 
   ul {
     list-style: none;
     padding: 0;
+    margin: 0;
     text-align: left;
+    position: relative;
+    z-index: 1;
 
     li {
-      background: rgba($primary-color, 0.2); // ✅ previously hardcoded rgba(193, 39, 45, 0.2)
-      padding: 10px;
+      background: rgba($primary-color, 0.2);
       margin: 5px 0;
       border-radius: 5px;
-      font-size: 16px;
       transition: background 0.3s;
-      color: $channel-text-color;
+      overflow: hidden;
 
       &:hover {
-        background: $primary-color;
+        background: rgba($primary-color, 0.4);
       }
     }
+  }
+
+  .channel-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 12px 15px;
+    background: none;
+    border: none;
+    color: $channel-text-color;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: $primary-font-family;
+
+    .channel-number {
+      font-weight: 600;
+      min-width: 90px;
+      color: $secondary-color;
+    }
+
+    .channel-name {
+      flex: 1;
+      font-weight: 400;
+    }
+
+    .live-indicator {
+      color: #ff4444;
+      font-size: 0.875rem;
+      font-weight: 600;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    &:hover {
+      .channel-number {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .guide-loading,
+  .no-channels {
+    padding: 2rem;
+    text-align: center;
+    color: rgba($channel-text-color, 0.6);
+    font-size: 16px;
+    position: relative;
+    z-index: 1;
   }
 
   .close-btn {
     position: absolute;
     width: 10%;
+    min-width: 40px;
     top: 10px;
     right: 10px;
     background: $background-color-primary;
-    border: none;
+    border: 2px solid $border-color-primary;
     color: $channel-text-color;
     padding: 8px 12px;
     font-size: 16px;
     font-weight: bold;
     border-radius: 5px;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    z-index: 2;
 
     &:hover {
       background: $secondary-color;
+      color: $background-color-primary;
+      transform: scale(1.05);
     }
+  }
+}
+
+// Pulse animation for live indicator
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }
