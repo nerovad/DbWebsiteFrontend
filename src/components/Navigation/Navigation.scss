@@ -90,20 +90,24 @@
   .channel-button {
     background-color: transparent; 
     border: none;
-    color: $text-color-secondary;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    font-weight: 700;
+    padding: 0.2rem .1rem;
     cursor: pointer;
     border-radius: 6px;
     transition: background 0.3s ease-in-out;
-    font-family: $primary-font-family;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
       background-color: $primary-color;
     }
-  }
 
+    img {
+      width: 50px;
+      height: 50px;
+      display: block;
+    }
+  }
   // Mute and Fullscreen Buttons
   .mute-button,
   .fullscreen-button, 
@@ -118,14 +122,18 @@
     border-radius: 6px;
     transition: background 0.3s ease-in-out;
     font-family: $primary-font-family;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
       background-color: $primary-color;
     }
 
-    svg {
-      width: 20px;
-      height: 20px;
+    img {
+      width: 50px;
+      height: 50px;
+      display: block;
     }
   }
 

@@ -4,7 +4,11 @@ import { FaUserCircle, FaVolumeMute, FaExpand, FaTv } from "react-icons/fa";
 import Logo from "../../assets/cinezoo_logo_neon_7.svg";
 import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import "./Navigation.scss";
-
+import UpArrow from "../../assets/up_arrow_icon.svg"
+import DownArrow from "../../assets/down_arrow.svg"
+import TvGuide from "../../assets/tv_guide_icon.svg"
+import Fullscreen from "../../assets/fullscreen_icon.svg"
+import Mute from "../../assets/mute_icon.svg"
 // ⬇️ import the modal we created earlier
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 
@@ -75,17 +79,17 @@ const SearchNavBar: React.FC<NavBarProps> = ({
       {/* Center Controls */}
       <div className="search-navbar__center">
         <button className="channel-button" onClick={goToPreviousVideo}>
-          Ch-
+          <img src={DownArrow} alt="Previous Channel" className="channel-arrow-icon" />
         </button>
         <button className="channel-button" onClick={goToNextVideo}>
-          Ch+
+          <img src={UpArrow} alt="Next Channel" className="channel-arrow-icon" />
         </button>
 
         <button
           className="search-navbar__tv-guide-button"
           onClick={(e) => { e.preventDefault(); setIsGuideOpen?.((prev) => !prev); }}
         >
-          <FaTv size={20} />
+          <img src={TvGuide} alt="TV Guide" />
         </button>
 
         <div className="search-navbar__channel-input-container">
@@ -104,15 +108,14 @@ const SearchNavBar: React.FC<NavBarProps> = ({
 
         {/* Mute Button */}
         <button className="mute-button" onClick={toggleMute}>
-          <FaVolumeMute size={20} />
+          <img src={Mute} alt="Mute" />
         </button>
 
         {/* Fullscreen Button */}
         <button className="fullscreen-button" onClick={toggleFullscreen}>
-          <FaExpand size={20} />
+          <img src={Fullscreen} alt="Fullscreen" />
         </button>
       </div>
-
       {/* Right Links & Profile/Login */}
       <div className="search-navbar__links">
 
