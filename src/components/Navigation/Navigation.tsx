@@ -160,4 +160,3 @@ const SearchNavBar: React.FC<NavBarProps> = ({
 };
 
 export default SearchNavBar;
-
