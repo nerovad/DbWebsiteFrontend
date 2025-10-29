@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaVolumeMute, FaExpand, FaTv } from "react-icons/fa";
-import Logo from "../../assets/cinezoo_Logo_V3.png";
+import Logo from "../../assets/cinezoo_logo_neon_7.svg";
 import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import "./Navigation.scss";
 
