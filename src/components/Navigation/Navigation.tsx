@@ -2,14 +2,12 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaVolumeMute, FaExpand, FaTv } from "react-icons/fa";
 import Logo from "../../assets/cinezoo_logo_neon_7.svg";
-import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
 import "./Navigation.scss";
 import UpArrow from "../../assets/up_arrow_icon.svg"
 import DownArrow from "../../assets/down_arrow.svg"
 import TvGuide from "../../assets/tv_guide_icon.svg"
 import Fullscreen from "../../assets/fullscreen_icon.svg"
 import Mute from "../../assets/mute_icon.svg"
-// ⬇️ import the modal we created earlier
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 
 interface NavBarProps {
@@ -26,7 +24,6 @@ interface NavBarProps {
   toggleFullscreen: () => void;
   loadVideo: (src: string) => void;
 
-  // ⬇️ these were used but not typed in your snippet
   setIsAuthOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setAuthMode: (mode: "login" | "register") => void;
 }
@@ -152,7 +149,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
         )}
       </div>
 
-      {/* ⬇️ Modal lives at root of the navbar so overlay sits above the app */}
+      {/*Modal */}
       <CreateChannelModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}

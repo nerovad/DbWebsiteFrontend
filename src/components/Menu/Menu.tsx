@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import "./Menu.scss";
-import LeftArrowIcon from "../../assets/Left_Arrow.svg";
+import RewindIcon from "../../assets/rewind_icon.svg";
 import { useChatStore } from "../../store/useChatStore";
 
 /* === PROPS === */
@@ -327,7 +327,7 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
       {/* === SIDEBAR === */}
       <div className={`utilities-container ${isOpen ? "open" : ""}`}>
         <button className={`toggle-button-left ${isOpen ? "open" : ""}`} onClick={toggleMenu}>
-          <img src={LeftArrowIcon} alt="Toggle" />
+          <img src={RewindIcon} alt="Toggle" />
         </button>
 
         <div className={`utilities-menu ${isOpen ? "open" : ""}`}>

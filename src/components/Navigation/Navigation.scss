@@ -215,9 +215,12 @@
     transition: background 0.3s ease-in-out;
     font-size: 0.875rem;
     font-family: $primary-font-family;
-    
+    font-weight: 700;
+    transition: transform 0.12s ease-in-out, filter 0.12s ease-in-out;
+
     &:hover {
-      background-color: darken($primary-color, 5%);
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 8px $primary-color) brightness(1.2);
     }
   }
 
