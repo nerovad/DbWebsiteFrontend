@@ -43,46 +43,51 @@
     align-items: center;
     background-color: $background-color-primary;
     border-radius: 6px;
-    border: 2px solid $secondary-color;
-    transition: border-color 0.3s ease-in-out;
+    border: 2.4px solid $primary-color;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     padding: 0.3rem;
-    height: 30px;
+    height: 35px;
     width: 90px;
     justify-content: space-between;
     margin-top: 4px;
 
     &:focus-within {
-      border: 3px solid $secondary-color; 
+      border: 3px solid $primary-color;
+      box-shadow: 0 0 12px rgba($primary-color, 0.6);
     }
 
     input {
       background: transparent;
       border: none;
-      color: $channel-text-color;
-      font-size: 1rem;
+      color: $accent-secondary-color;
+      font-size: 1.1rem;
       outline: none;
       text-align: center;
       width: 70%;
       font-family: $primary-font-family;
-
+      font-weight: 700;
+      text-shadow: 0 0 2px $accent-secondary-color;
       &::placeholder {
-        color: $text-color-secondary;
+        color: $accent-secondary-color;
+        text-shadow: 0 0 2px $accent-secondary-color;
       }
     }
 
     .channel-go-button {
       background-color: transparent;
-      color: $text-color-secondary;
+      color: $primary-color;
       border: none;
       padding: 5px;
       cursor: pointer;
       border-radius: 4px;
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 700;
-      transition: background 0.3s;
+      transition: transform 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
+      text-shadow: 0 0 2px $primary-color;
 
       &:hover {
-        background-color: $primary-color;
+        transform: scale(1.15);
+        text-shadow: 0 0 10px $primary-color, 0 0 16px $primary-color;
       }
     }
   }
