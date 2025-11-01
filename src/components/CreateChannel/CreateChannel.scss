@@ -75,3 +75,65 @@
     &:hover { background: $secondary-color; }
   }
 }
+.create-channel-form {
+  .form-group {
+    margin-bottom: 20px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: $secondary-color;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      background: $background-color-primary;
+      border: 1px solid $border-color-primary;
+      border-radius: 5px;
+      color: $primary-color;
+      font-family: $primary-font-family;
+      font-size: 14px;
+
+      &:focus {
+        outline: none;
+        border-color: $secondary-color;
+        box-shadow: 0 0 5px rgba($secondary-color, 0.5);
+      }
+    }
+
+    small {
+      display: block;
+      margin-top: 5px;
+      color: $channel-text-color;
+      font-size: 12px;
+    }
+  }
+
+  .error-message {
+    color: #ff4444;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid #ff4444;
+    border-radius: 5px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: $secondary-color;
+    border: none;
+    color: $background-color-primary;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      background: lighten($secondary-color, 10%);
+      box-shadow: 0 0 10px rgba($secondary-color, 0.5);
+    }
+  }
+}

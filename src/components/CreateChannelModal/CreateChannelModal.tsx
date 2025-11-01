@@ -21,10 +21,10 @@ const emptyFilm: NewFilm = { title: "", creator: "", duration: "", thumbnail: ""
 
 const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }) => {
   const boxRef = useRef<HTMLDivElement>(null);
-  const firstFieldRef = useRef<HTMLInputElement>(null);
+  const firstFieldRef = useRef<HTMLSelectElement>(null);
 
   // base channel
-  const [name, setName] = useState("");
+  const [channelNumber, setChannelNumber] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -41,6 +41,14 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
   // films
   const [films, setFilms] = useState<NewFilm[]>([{ ...emptyFilm }]);
+
+  // Generate available channel numbers (e.g., 2-99)
+  const availableChannels = Array.from({ length: 199 }, (_, i) => i + 2);
+
+  // Auto-generate internal name from channel number
+  const generateInternalName = (num: string): string => {
+    return num ? `channel_${num}` : "";
+  };
 
   // Close on outside click
   useEffect(() => {
@@ -74,13 +82,11 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
   }, [isOpen, onClose]);
 
   const canSubmit = () => {
-    if (!name.trim() || !displayName.trim()) return false;
+    if (!channelNumber || !displayName.trim()) return false;
     if (!addEvent) return true;
-    // festival fields required when addEvent is true
     if (!eventTitle.trim()) return false;
     if (!startsAt || !endsAt) return false;
     if (new Date(startsAt) >= new Date(endsAt)) return false;
-    // at least 1 valid film
     const validFilms = films.filter(f => f.title.trim().length > 0);
     return validFilms.length > 0;
   };
@@ -107,29 +113,29 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
     setSubmitting(true);
     try {
-      // Single atomic POST with nested event + films
       const body: any = {
-        name,
+        name: generateInternalName(channelNumber), // AUTO-GENERATED
         display_name: displayName,
-        type: addEvent ? "festival" : "channel", // fits your existing channels table
+        channel_number: parseInt(channelNumber),   // Include the number itself
+        type: addEvent ? "festival" : "channel",
       };
 
       if (addEvent) {
         body.event = {
-          kind: eventType,              // "film_festival"
+          kind: eventType,
           title: eventTitle,
           starts_at: new Date(startsAt).toISOString(),
           ends_at: new Date(endsAt).toISOString(),
-          voting_mode: votingMode,      // "ratings" | "battle"
+          voting_mode: votingMode,
           require_login: requireLogin,
         };
-        body.films = normalizeFilms();   // [{title, creator?, duration?, thumbnail?}]
+        body.films = normalizeFilms();
       }
 
       const res = await fetch("/api/channels", {
         method: "POST",
-        headers: authHeaders(),                          // <-- adds Authorization: Bearer <token>
-        credentials: "include" as RequestCredentials,    // (optional) if you also use cookies
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(body),
       });
 
@@ -138,22 +144,20 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
         throw new Error(`Failed to create channel: ${res.status} ${msg}`);
       }
 
-      if (res.ok) {
-        const data = await res.json();
-        setChannelInfo(data);
-        setName("");
-        setDisplayName("");
-        setAddEvent(false);
-        setEventTitle("");
-        setStartsAt("");
-        setEndsAt("");
-        setVotingMode("ratings");
-        setRequireLogin(true);
-        setFilms([{ ...emptyFilm }]);
-        setSuccess(true);
-      } else {
-        console.error("Failed to create channel");
-      }
+      const data = await res.json();
+      setChannelInfo(data);
+
+      // Reset form
+      setChannelNumber("");
+      setDisplayName("");
+      setAddEvent(false);
+      setEventTitle("");
+      setStartsAt("");
+      setEndsAt("");
+      setVotingMode("ratings");
+      setRequireLogin(true);
+      setFilms([{ ...emptyFilm }]);
+      setSuccess(true);
     } catch (err) {
       console.error("Error submitting channel", err);
     } finally {
@@ -171,21 +175,39 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
         <h2 id="create-channel-title">Create Channel</h2>
 
         <form className="create-channel-form" onSubmit={handleSubmit}>
-          <input
-            ref={firstFieldRef}
-            type="text"
-            placeholder="Internal name (e.g. channel42)"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Display name (e.g. Channel 42)"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            required
-          />
+          {/* UPDATED: Channel Number Dropdown */}
+          <div className="row">
+            <label htmlFor="channel-number">Channel Number</label>
+            <select
+              ref={firstFieldRef}
+              id="channel-number"
+              value={channelNumber}
+              onChange={(e) => setChannelNumber(e.target.value)}
+              required
+            >
+              <option value="">Select a channel number...</option>
+              {availableChannels.map(num => (
+                <option key={num} value={num}>
+                  Channel {num}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* UPDATED: Display Name with character limit */}
+          <div className="row">
+            <label htmlFor="display-name">Channel Display Name</label>
+            <input
+              id="display-name"
+              type="text"
+              placeholder="e.g., Cinema, Horror Marathon..."
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value.slice(0, 20))}
+              maxLength={20}
+              required
+            />
+            <small className="form-hint">{displayName.length}/20 characters</small>
+          </div>
 
           {/* Add Event Toggle */}
           <button

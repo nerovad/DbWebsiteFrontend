@@ -12,6 +12,8 @@ try {
 type Channel = {
   id: string;
   name: string;
+  display_name?: string;
+  channel_number?: number;  // ADD THIS
   slug?: string;
   description?: string;
   isLive?: boolean;
@@ -119,7 +121,10 @@ const TvGuide: React.FC<TvGuideProps> = ({ isOpen, closeGuide }) => {
                   className="channel-link"
                   onClick={() => handleChannelClick(channel)}
                 >
-                  <span className="channel-name">{channel.name}</span>
+                  <span className="channel-name">
+                    {channel.channel_number ? `Channel ${channel.channel_number}` : ''}
+                    {channel.display_name ? ` - ${channel.display_name}` : channel.name}
+                  </span>
                   {channel.isLive && <span className="live-indicator">● LIVE</span>}
                 </button>
               </li>

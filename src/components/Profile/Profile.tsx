@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./Profile.scss";
 import AvatarPicker from "./AvatarPicker";
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
+import Messages from "./Messages";
 import { useApi } from "../../utils/useApi";
 import Logo from "../../assets/cinezoo_Logo_V3.png";
 
@@ -15,6 +16,7 @@ try {
 type Channel = {
   id: string;
   name: string;
+  display_name?: string;  // ADD THIS
   slug?: string;
   description?: string;
   isLive?: boolean;
@@ -65,7 +67,7 @@ type ProfileData = {
   };
 };
 
-type TabKey = "overview" | "channels" | "films" | "awards" | "companies" | "settings";
+type TabKey = "overview" | "channels" | "films" | "awards" | "messages" | "companies" | "settings";
 
 const DEFAULT_PROFILE: ProfileData = {
   id: "me",
@@ -276,6 +278,7 @@ const Profile: React.FC = () => {
           ["overview", "Overview"],
           ["channels", "Channels"],
           ["awards", "Awards"],
+          ["messages", "Messages"],
           ["settings", "Settings"],
         ].map(([key, label]) => (
           <button
@@ -366,13 +369,14 @@ const Profile: React.FC = () => {
                       ) : (
                         <div className="thumb-fallback">
                           <div className="channel-placeholder">
-                            <span className="channel-icon">📺</span> {/* or use an icon */}
+                            <span className="channel-icon">📺</span>
                           </div>
                         </div>
                       )}
                       {ch.isLive && <span className="live-pill">LIVE</span>}
-                    </div>                    <div className="card-body">
-                      <div className="card-title">{ch.name}</div>
+                    </div>
+                    <div className="card-body">
+                      <div className="card-title">{ch.display_name || ch.name}</div>
                       {ch.description && <p className="card-desc">{ch.description}</p>}
                       <div className="card-actions">
                         <a
@@ -411,6 +415,12 @@ const Profile: React.FC = () => {
                 ))}
               </ul>
             )}
+          </section>
+        )}
+
+        {active === "messages" && (
+          <section className="panel">
+            <Messages />
           </section>
         )}
 

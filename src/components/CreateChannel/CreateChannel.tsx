@@ -1,53 +1,82 @@
-import React, { useEffect, useRef } from "react";
-import "./CreateChannel.scss";
-import CreateChannel from "./CreateChannel";
+import React, { useState } from "react";
 
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  excludeClickId?: string; // optional: e.g. "remote-button"
-}
+const CreateChannelForm: React.FC = () => {
+  const [channelName, setChannelName] = useState("");
+  const [selectedNumber, setSelectedNumber] = useState("");
+  const [error, setError] = useState("");
 
-const CreateChannelOverlay: React.FC<Props> = ({ isOpen, onClose, excludeClickId }) => {
-  const boxRef = useRef<HTMLDivElement>(null);
+  // Generate available channel numbers (e.g., 2-99, excluding 1 which might be reserved)
+  const availableChannels = Array.from({ length: 98 }, (_, i) => i + 2);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const excludeEl = excludeClickId ? document.getElementById(excludeClickId) : null;
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-      if (
-        boxRef.current &&
-        !boxRef.current.contains(event.target as Node) &&
-        (!excludeEl || !excludeEl.contains(event.target as Node))
-      ) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "hidden"; // prevent background scroll (optional)
+    if (!channelName.trim()) {
+      setError("Channel name is required");
+      return;
     }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose, excludeClickId]);
 
-  if (!isOpen) return null;
+    if (!selectedNumber) {
+      setError("Please select a channel number");
+      return;
+    }
+
+    // Auto-generate slug from name
+    const slug = channelName
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-") // replace non-alphanumeric with hyphens
+      .replace(/^-+|-+$/g, "");     // remove leading/trailing hyphens
+
+    // TODO: Send to API/backend
+    console.log({
+      name: channelName,
+      number: parseInt(selectedNumber),
+      slug: slug
+    });
+
+    setError("");
+  };
 
   return (
-    <div className="create-channel-overlay">
-      <div className="create-channel-content" ref={boxRef}>
-        <button className="close-btn" onClick={onClose} aria-label="Close create channel">
-          X
-        </button>
-        <h2>Create Channel</h2>
-        <CreateChannelForm />
+    <form className="create-channel-form" onSubmit={handleSubmit}>
+      <div className="form-group">
+        <label htmlFor="channel-name">Channel Name:</label>
+        <input
+          id="channel-name"
+          type="text"
+          value={channelName}
+          onChange={(e) => setChannelName(e.target.value.slice(0, 20))}
+          maxLength={20}
+          placeholder="Enter channel name..."
+          autoFocus
+        />
+        <small>{channelName.length}/20 characters</small>
       </div>
-    </div>
+
+      <div className="form-group">
+        <label htmlFor="channel-number">Channel Number:</label>
+        <select
+          id="channel-number"
+          value={selectedNumber}
+          onChange={(e) => setSelectedNumber(e.target.value)}
+        >
+          <option value="">Select a channel number...</option>
+          {availableChannels.map(num => (
+            <option key={num} value={num}>
+              Channel {num}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {error && <div className="error-message">{error}</div>}
+
+      <button type="submit" className="submit-btn">
+        Create Channel
+      </button>
+    </form>
   );
 };
 
-export default CreateChannelOverlay;
-
+export default CreateChannelForm;
