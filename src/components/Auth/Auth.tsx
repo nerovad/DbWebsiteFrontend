@@ -49,6 +49,11 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
           ? { email: emailOrUsername, username: emailOrUsername, password }
           : { email, username, password };
 
+      // ADD THESE 3 LINES HERE:
+      console.log("Auth mode:", authMode);
+      console.log("Sending body:", body);
+      console.log("To URL:", url);
+
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -57,6 +62,11 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
 
       // Don't call res.json() blindly—404/HTML will crash JSON.parse
       const text = await res.text();
+
+      // ADD THESE 2 LINES HERE:
+      console.log("Server response status:", res.status);
+      console.log("Server response text:", text);
+
       let data: any = {};
       try {
         data = text ? JSON.parse(text) : {};
