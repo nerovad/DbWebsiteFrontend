@@ -141,7 +141,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
             <FaUserCircle className="search-navbar__profile-icon" size={24} />
             {showDropdown && (
               <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
-                <Link to="/profile" className="profile-dropdown__item">Profile</Link>
+                <Link to="/profile" className="profile-dropdown__item">My Space</Link>
                 <button onClick={handleLogout} className="profile-dropdown__logout">Log out</button>
               </div>
             )}
