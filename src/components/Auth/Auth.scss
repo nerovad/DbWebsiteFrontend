@@ -22,17 +22,7 @@
     width: 350px;
     position: relative;
   }
-
-  .close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
+}
 
 .auth-container {
   display: flex;
@@ -43,53 +33,79 @@
   background-color: $background-color-primary;
 }
 
-.auth-card h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #fff;
+.auth-card {
+  position: relative;
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  input {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+
+  button[type="submit"] {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background: $primary-color;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover {
+      background: darken($primary-color, 10%);
+    }
+  }
+
+  p {
+    margin-top: 1rem;
+    color: #ddd;
+  }
+
+  span {
+    color: $primary-color;
+    cursor: pointer;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
-.auth-card form {
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent !important;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 2rem;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+  line-height: 1;
 
-.auth-card input {
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  &:hover {
+    color: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+  }
 }
-
-.auth-card button {
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background: $primary-color;
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.auth-card button:hover {
-  background: darken($primary-color, 10%);
-}
-
-.auth-card p {
-  margin-top: 1rem;
-  color: #ddd;
-}
-
-.auth-card span {
-  color: $primary-color;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.auth-card span:hover {
-  text-decoration: underline;
-}
-}
-
