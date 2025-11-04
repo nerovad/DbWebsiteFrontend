@@ -4,7 +4,7 @@ import AvatarPicker from "./AvatarPicker";
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 import Messages from "./Messages";
 import { useApi } from "../../utils/useApi";
-import Logo from "../../assets/cinezoo_Logo_V3.png";
+import Logo from "../../assets/cinezoo_logo_neon_7.svg";
 
 // Try to import your chat store if available; fall back gracefully.
 let useChatStore: any = null;

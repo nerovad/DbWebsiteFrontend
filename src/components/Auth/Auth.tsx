@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import TermsOfService from "./TermsOfService";
 import "./Auth.scss";
 
 interface AuthProps {
@@ -13,9 +14,24 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [showTos, setShowTos] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If registering, show ToS first
+    if (authMode === "register") {
+      setShowTos(true);
+      return;
+    }
+
+    // Otherwise, proceed with login
+    await proceedWithAuth();
+  };
+
+  const proceedWithAuth = async () => {
     if (authMode === "register" && password !== confirmPassword) {
       alert("Passwords do not match.");
       return;
@@ -28,12 +44,15 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
           ? "http://localhost:4000/api/auth/login"
           : "http://localhost:4000/api/auth/register";
 
-      // Your backend accepts either email OR username for login.
-      // For registration, you're using one field for both (okay for now).
       const body =
         authMode === "login"
           ? { email: emailOrUsername, username: emailOrUsername, password }
-          : { email: emailOrUsername, username: emailOrUsername, password };
+          : { email, username, password };
+
+      // ADD THESE 3 LINES HERE:
+      console.log("Auth mode:", authMode);
+      console.log("Sending body:", body);
+      console.log("To URL:", url);
 
       const res = await fetch(url, {
         method: "POST",
@@ -41,13 +60,18 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
         body: JSON.stringify(body),
       });
 
-      // Don’t call res.json() blindly—404/HTML will crash JSON.parse
+      // Don't call res.json() blindly—404/HTML will crash JSON.parse
       const text = await res.text();
+
+      // ADD THESE 2 LINES HERE:
+      console.log("Server response status:", res.status);
+      console.log("Server response text:", text);
+
       let data: any = {};
       try {
         data = text ? JSON.parse(text) : {};
       } catch {
-        // response wasn’t JSON (e.g., 404 HTML); leave data as {}
+        // response wasn't JSON (e.g., 404 HTML); leave data as {}
       }
 
       if (!res.ok) {
@@ -73,9 +97,8 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
     } finally {
       setSubmitting(false);
     }
-  };
 
-  return (
+  }; return (
     <div className="auth-overlay">
       <div className="auth-card">
         <button className="close-btn" onClick={() => setIsAuthOpen(false)} disabled={submitting}>
@@ -83,14 +106,35 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
         </button>
         <h2>{authMode === "login" ? "Login" : "Register"}</h2>
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Email or Username"
-            value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
-            required
-            disabled={submitting}
-          />
+          {authMode === "register" ? (
+            <>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={submitting}
+              />
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                disabled={submitting}
+              />
+            </>
+          ) : (
+            <input
+              type="text"
+              placeholder="Email or Username"
+              value={emailOrUsername}
+              onChange={(e) => setEmailOrUsername(e.target.value)}
+              required
+              disabled={submitting}
+            />
+          )}
           <input
             type="password"
             placeholder="Password"
@@ -120,6 +164,17 @@ const Auth: React.FC<AuthProps> = ({ setIsLoggedIn, setIsAuthOpen, authMode, set
           </span>
         </p>
       </div>
+      {showTos && (
+        <TermsOfService
+          onAccept={() => {
+            setShowTos(false);
+            proceedWithAuth();
+          }}
+          onDecline={() => {
+            setShowTos(false);
+          }}
+        />
+      )}
     </div>
   );
 };

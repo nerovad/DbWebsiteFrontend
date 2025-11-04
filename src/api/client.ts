@@ -2,6 +2,11 @@
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 // ^ adjust if your backend runs elsewhere
 
+export function authHeaders(): Record<string, string> {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 async function request(path: string, options: RequestInit = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: {

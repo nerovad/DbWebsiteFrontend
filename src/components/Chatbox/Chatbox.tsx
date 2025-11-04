@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import "./Chatbox.scss";
-import RightArrowIcon from "../../assets/Right_Arrow.svg";
+import FastForwardIcon from "../../assets/fast_forward_icon.svg";
 import { useChatStore } from "../../store/useChatStore";
 import { getUsernameColor } from "../../utils/getUsernameColor";
 
@@ -78,7 +78,7 @@ const Chatbox: React.FC<ChatboxProps> = ({ isOpen, setIsOpen }) => {
         className={`toggle-button-right ${isOpen ? "open" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <img src={RightArrowIcon} alt="Toggle Chat" />
+        <img src={FastForwardIcon} alt="Toggle Chat" />
       </button>
 
       <div className={`chatbox-content ${isOpen ? "open" : ""}`}>

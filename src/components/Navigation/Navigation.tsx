@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle, FaVolumeMute, FaExpand, FaTv } from "react-icons/fa";
-import Logo from "../../assets/cinezoo_Logo_V3.png";
-import TvGuideIcon from "../../assets/DBwebsiteIconDBTV.svg";
+import Logo from "../../assets/cinezoo_logo_neon_7.svg";
 import "./Navigation.scss";
-
-// ⬇️ import the modal we created earlier
+import UpArrow from "../../assets/up_arrow_icon.svg"
+import DownArrow from "../../assets/down_arrow.svg"
+import TvGuide from "../../assets/tv_guide_icon.svg"
+import Fullscreen from "../../assets/fullscreen_icon.svg"
+import Mute from "../../assets/mute_icon.svg"
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 
 interface NavBarProps {
@@ -22,7 +24,6 @@ interface NavBarProps {
   toggleFullscreen: () => void;
   loadVideo: (src: string) => void;
 
-  // ⬇️ these were used but not typed in your snippet
   setIsAuthOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setAuthMode: (mode: "login" | "register") => void;
 }
@@ -75,17 +76,17 @@ const SearchNavBar: React.FC<NavBarProps> = ({
       {/* Center Controls */}
       <div className="search-navbar__center">
         <button className="channel-button" onClick={goToPreviousVideo}>
-          Ch-
+          <img src={DownArrow} alt="Previous Channel" className="channel-arrow-icon" />
         </button>
         <button className="channel-button" onClick={goToNextVideo}>
-          Ch+
+          <img src={UpArrow} alt="Next Channel" className="channel-arrow-icon" />
         </button>
 
         <button
           className="search-navbar__tv-guide-button"
           onClick={(e) => { e.preventDefault(); setIsGuideOpen?.((prev) => !prev); }}
         >
-          <FaTv size={20} />
+          <img src={TvGuide} alt="TV Guide" />
         </button>
 
         <div className="search-navbar__channel-input-container">
@@ -104,15 +105,14 @@ const SearchNavBar: React.FC<NavBarProps> = ({
 
         {/* Mute Button */}
         <button className="mute-button" onClick={toggleMute}>
-          <FaVolumeMute size={20} />
+          <img src={Mute} alt="Mute" />
         </button>
 
         {/* Fullscreen Button */}
         <button className="fullscreen-button" onClick={toggleFullscreen}>
-          <FaExpand size={20} />
+          <img src={Fullscreen} alt="Fullscreen" />
         </button>
       </div>
-
       {/* Right Links & Profile/Login */}
       <div className="search-navbar__links">
 
@@ -141,7 +141,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
             <FaUserCircle className="search-navbar__profile-icon" size={24} />
             {showDropdown && (
               <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
-                <Link to="/profile" className="profile-dropdown__item">Profile</Link>
+                <Link to="/profile" className="profile-dropdown__item">My Space</Link>
                 <button onClick={handleLogout} className="profile-dropdown__logout">Log out</button>
               </div>
             )}
@@ -149,7 +149,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
         )}
       </div>
 
-      {/* ⬇️ Modal lives at root of the navbar so overlay sits above the app */}
+      {/*Modal */}
       <CreateChannelModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
@@ -160,4 +160,3 @@ const SearchNavBar: React.FC<NavBarProps> = ({
 };
 
 export default SearchNavBar;
-

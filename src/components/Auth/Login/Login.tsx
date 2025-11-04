@@ -13,17 +13,15 @@ const Login: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const response = await fetch("http://localhost:4000/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: emailOrUsername, username: emailOrUsername, password }),
     });
-
     const data = await response.json();
     if (response.ok) {
       localStorage.setItem("token", data.token);
-      setIsLoggedIn(true); // ✅ Immediately update state
+      setIsLoggedIn(true);
       navigate("/");
     } else {
       alert(data.error);
@@ -33,6 +31,9 @@ const Login: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
   return (
     <div className="auth-container">
       <div className="auth-card">
+        <button className="close-btn" onClick={() => navigate("/")} aria-label="Close">
+          ×
+        </button>
         <h2>Login</h2>
         <form onSubmit={handleLogin}>
           <input
@@ -47,7 +48,8 @@ const Login: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required />
+            required
+          />
           <button type="submit">Login</button>
         </form>
         <p>Don't have an account? <a href="/register">Register</a></p>
@@ -57,4 +59,3 @@ const Login: React.FC<LoginProps> = ({ setIsLoggedIn }) => {
 };
 
 export default Login;
-
