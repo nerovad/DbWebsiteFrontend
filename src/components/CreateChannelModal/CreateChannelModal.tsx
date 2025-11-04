@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { authHeaders } from "../../api/client";
 import "./CreateChannelModal.scss";
 
 interface Props {
