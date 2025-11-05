@@ -357,6 +357,19 @@
     }
   }
 
+  .card-title {
+  .channel-number {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $secondary-color; // or whatever your accent color is
+    margin-bottom: 0.25rem;
+  }
+
+  .channel-display-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+}
   /* ===== Business Card ===== */
   .biz-grid {
     display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px;

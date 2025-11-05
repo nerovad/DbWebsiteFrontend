@@ -18,6 +18,7 @@ type Channel = {
   id: string;
   name: string;
   display_name?: string;  // ADD THIS
+  channel_number?: number;
   slug?: string;
   description?: string;
   isLive?: boolean;
@@ -409,7 +410,10 @@ const Profile: React.FC = () => {
                       {ch.isLive && <span className="live-pill">LIVE</span>}
                     </div>
                     <div className="card-body">
-                      <div className="card-title">{ch.display_name || ch.name}</div>
+                      <div className="card-title">
+                        {ch.channel_number && <div className="channel-number">Channel {ch.channel_number}</div>}
+                        <div className="channel-display-name">{ch.display_name || ch.name}</div>
+                      </div>
                       {ch.description && <p className="card-desc">{ch.description}</p>}
                       <div className="card-actions">
 
