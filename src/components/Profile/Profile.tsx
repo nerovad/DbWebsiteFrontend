@@ -3,6 +3,7 @@ import "./Profile.scss";
 import AvatarPicker from "./AvatarPicker";
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 import Messages from "./Messages";
+import EditChannelModal from "../EditChannelModal/EditChannelModal";
 import { useApi } from "../../utils/useApi";
 import Logo from "../../assets/cinezoo_logo_neon_7.svg";
 
@@ -92,9 +93,7 @@ const Profile: React.FC = () => {
 
   const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
   const [channels, setChannels] = useState<Channel[]>([]);
-  const [films, setFilms] = useState<Film[]>([]);
   const [awards, setAwards] = useState<Award[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [isCreateChannelOpen, setIsCreateChannelOpen] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -102,6 +101,9 @@ const Profile: React.FC = () => {
   // Editable fields
   const [bioDraft, setBioDraft] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
+  const [deletingChannelId, setDeletingChannelId] = useState<string | null>(null);
 
   // Pull channels from your store if available
   const storeChannels = useMemo(() => {
@@ -158,9 +160,7 @@ const Profile: React.FC = () => {
 
         if (mounted) {
           setProfile({ ...DEFAULT_PROFILE, ...profileData });
-          setFilms(filmsData);
           setAwards(awardsData);
-          setCompanies(companiesData);
           setBioDraft(profileData?.bio ?? "");
         }
 
@@ -222,6 +222,39 @@ const Profile: React.FC = () => {
       </div>
     );
   }
+
+  const handleChannelUpdate = (updatedChannel: any) => {
+    setChannels(prev => prev.map(ch =>
+      ch.id === updatedChannel.id ? { ...ch, ...updatedChannel } : ch
+    ));
+  };
+
+  const handleDeleteChannel = async (channelId: string, channelName: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${channelName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingChannelId(channelId);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/api/channels/${channelId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error('Delete failed');
+
+      setChannels(prev => prev.filter(ch => ch.id !== channelId));
+    } catch (error) {
+      console.error('Failed to delete channel:', error);
+      alert('Failed to delete channel. Please try again.');
+    } finally {
+      setDeletingChannelId(null);
+    }
+  };
 
   return (
     <div className="profile-page">
@@ -379,13 +412,25 @@ const Profile: React.FC = () => {
                       <div className="card-title">{ch.display_name || ch.name}</div>
                       {ch.description && <p className="card-desc">{ch.description}</p>}
                       <div className="card-actions">
-                        <a
-                          className="btn ghost"
+
+                        <a className="btn ghost"
                           href={ch.slug ? `/channel/${ch.slug}` : `/channel/${ch.id}`}
                         >
                           View
                         </a>
-                        <button className="btn">Edit</button>
+                        <button
+                          className="btn"
+                          onClick={() => setEditingChannel(ch)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn danger"
+                          onClick={() => handleDeleteChannel(ch.id, ch.display_name || ch.name)}
+                          disabled={deletingChannelId === ch.id}
+                        >
+                          {deletingChannelId === ch.id ? "Deleting..." : "Delete"}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -460,13 +505,20 @@ const Profile: React.FC = () => {
         onClose={() => setIsCreateChannelOpen(false)}
       />
 
+      <EditChannelModal
+        isOpen={!!editingChannel}
+        onClose={() => setEditingChannel(null)}
+        channel={editingChannel}
+        onUpdate={handleChannelUpdate}
+      />
+
       <AvatarPicker
         isOpen={showAvatarPicker}
         onClose={() => setShowAvatarPicker(false)}
         onSelect={handleAvatarSelect}
         currentAvatar={profile.avatarUrl}
       />
-    </div>
+    </div >
   );
 };
 
