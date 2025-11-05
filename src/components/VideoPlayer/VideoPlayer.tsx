@@ -4,7 +4,7 @@ import Hls from "hls.js";
 import "./VideoPlayer.scss";
 import Chatbox from "../Chatbox/Chatbox";
 import "../../styles/_variables.scss";
-import muteIcon from "../../assets/Mute.svg";
+import muteIcon from "../../assets/mute_icon.svg";
 import { useChatStore } from "../../store/useChatStore";
 
 interface VideoLink { src: string; channel: string; isLive?: boolean; }
