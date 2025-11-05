@@ -133,9 +133,13 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
         body.films = normalizeFilms();
       }
 
+      const token = localStorage.getItem("token");
       const res = await fetch("/api/channels", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         credentials: "include",
         body: JSON.stringify(body),
       });
