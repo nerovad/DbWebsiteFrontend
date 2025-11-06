@@ -99,8 +99,8 @@ const StarRow: React.FC<{ value: number; onChange: (v: number) => void }> = ({ v
 const VotingBallot: React.FC<{
   film: Film | null;
   onSubmit: (payload: BallotSubmit) => Promise<void> | void;
-  onNext: () => void; // next film (skip)
-}> = ({ film, onSubmit, onNext, onSeeAll }) => {
+  onSeeAll: () => void; // ADD THIS LINE
+}> = ({ film, onSubmit, onSeeAll }) => {
   const [score, setScore] = useState<number>(8);
   const [useStars, setUseStars] = useState<boolean>(true);
   const [tags, setTags] = useState<string[]>([]);
@@ -265,8 +265,7 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
 
   // fetch films whenever channel changes
   useEffect(() => {
-    let on = true;
-    (async () => {
+    let on = true; (async () => {
       if (!channelId) { setFilms([]); return; }
       try {
         const res = await fetch(`/api/channels/${encodeURIComponent(channelId)}/films`);
@@ -399,13 +398,11 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
             />
           ) : (
             <VotingBallot
-              film={films.length ? films[idx % films.length] : null}
+              film={currentFilm}
               onSubmit={async (payload) => {
                 await submitVote(payload);
-                // advance after vote
                 setIdx((i) => (i + 1) % Math.max(1, films.length));
               }}
-              onNext={() => setIdx((i) => (i + 1) % Math.max(1, films.length))}
               onSeeAll={() => setView("grid")}
             />
           )}
