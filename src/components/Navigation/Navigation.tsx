@@ -15,7 +15,7 @@ interface NavBarProps {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   currentIndex: number;
   setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
-  videoLinks: { src: string; channel: string }[];
+  videoLinks: { src: string; channel: string; channelNumber: number }[];
   videoRef: React.RefObject<HTMLVideoElement>;
   setIsGuideOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   goToNextVideo: () => void;
@@ -49,18 +49,31 @@ const SearchNavBar: React.FC<NavBarProps> = ({
   const [channelInput, setChannelInput] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false); // ⬅️ modal state
 
+  // Add this right at the top of the component, after the state declarations
+  console.log("Current videoLinks:", videoLinks);
+  console.log("Current index:", currentIndex);
+  console.log("Current channel number:", videoLinks[currentIndex]?.channelNumber);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
   };
 
   const goToChannel = () => {
-    const channelNumber = parseInt(channelInput, 10);
-    if (!isNaN(channelNumber) && channelNumber >= 0 && channelNumber < videoLinks.length) {
-      setCurrentIndex(channelNumber);
-      loadVideo(videoLinks[channelNumber].src);
-    } else {
+    const targetChannelNumber = parseInt(channelInput, 10);
+    if (isNaN(targetChannelNumber)) {
       alert("Invalid channel number");
+      return;
+    }
+
+    // Find the index of the video with this channel number
+    const targetIndex = videoLinks.findIndex(v => v.channelNumber === targetChannelNumber);
+
+    if (targetIndex !== -1) {
+      setCurrentIndex(targetIndex);
+      loadVideo(videoLinks[targetIndex].src);
+    } else {
+      alert(`Channel ${targetChannelNumber} not found`);
     }
   };
 
@@ -94,7 +107,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
             type="text"
             value={channelInput}
             onChange={(e) => setChannelInput(e.target.value)}
-            placeholder={`${currentIndex}`}
+            placeholder={`${videoLinks[currentIndex]?.channelNumber ?? currentIndex}`} // ⬅️ Show channel number
             className="channel-input"
             onKeyDown={(e) => e.key === "Enter" && goToChannel()}
           />

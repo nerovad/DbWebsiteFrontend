@@ -7,7 +7,7 @@ import "../../styles/_variables.scss";
 import muteIcon from "../../assets/mute_icon.svg";
 import { useChatStore } from "../../store/useChatStore";
 
-interface VideoLink { src: string; channel: string; isLive?: boolean; }
+interface VideoLink { src: string; channel: string; isLive?: boolean; channelNumber: number; }
 
 interface VideoPlayerProps {
   isMenuOpen: boolean;
@@ -44,7 +44,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
   const [isMuted, setIsMuted] = useState(true);
   const [showMuteIcon, setShowMuteIcon] = useState(false);
   const [videoLinks, setVideoLinks] = useState<VideoLink[]>([
-    { src: "/videos/Color_Bars_DB_Web.mp4", channel: "channel-0", isLive: false },
+    { src: "/videos/Color_Bars_DB_Web.mp4", channel: "channel-0", channelNumber: 0, isLive: false },
   ]);
 
   const getClassNames = () => {
@@ -196,6 +196,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
   }, []);
 
   // ✅ Fetch channels
+  // ✅ Fetch channels
   useEffect(() => {
     let alive = true;
 
@@ -204,17 +205,33 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
         const res = await fetch("/api/channels");
         const channels = await res.json();
 
+        console.log("Raw API response:", channels); // ⬅️ ADD THIS
+
         const dynamic: VideoLink[] = channels
           .map((ch: any) => {
             const key = ch.stream_key ?? ch.slug ?? ch.key;
             if (!key) return null;
             const src = `${HLS_BASE}/hls/${key}/index.m3u8`;
-            return { src, channel: ch.slug ?? key, isLive: true };
+            return {
+              src,
+              channel: ch.slug ?? key,
+              channelNumber: ch.channel_number ?? 0,
+              isLive: true
+            };
           })
           .filter(Boolean) as VideoLink[];
 
+        // Sort AFTER the filter and cast
+        dynamic.sort((a: VideoLink, b: VideoLink) => a.channelNumber - b.channelNumber);
+
+        console.log("Dynamic videoLinks after sorting:", dynamic); // ⬅️ ADD THIS
+
         if (alive) {
-          setVideoLinks(prev => [prev[0], ...dynamic]);
+          setVideoLinks(prev => {
+            const updated = [prev[0], ...dynamic];
+            console.log("Final videoLinks array:", updated); // ⬅️ ADD THIS
+            return updated;
+          });
         }
       } catch (e) {
         console.error("Failed to fetch channels", e);
@@ -223,7 +240,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ isMenuOpen, isChatOpen, setVi
 
     return () => { alive = false; };
   }, []);
-
   // ✅ Sync URL parameter to video player state
   useEffect(() => {
     if (!channelSlug || videoLinks.length === 0) return;
