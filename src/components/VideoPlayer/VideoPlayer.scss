@@ -6,6 +6,8 @@
   align-items: center;
   width: 100vw;
   height: 100vh;
+  top: 50px;
+  height: calc(100vh - 50px - 38px);
   overflow: hidden;
   position: relative;
   background-color: $background-color-primary;
@@ -49,8 +51,8 @@
   font-size: 80px;
   color: $channel-text-color;
   position: absolute;
-  top: 20px;
-  left: 40px;
+  top: 1px;
+  left: 36px;
   z-index: 3;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
