@@ -99,7 +99,7 @@ const StarRow: React.FC<{ value: number; onChange: (v: number) => void }> = ({ v
 const VotingBallot: React.FC<{
   film: Film | null;
   onSubmit: (payload: BallotSubmit) => Promise<void> | void;
-  onSeeAll: () => void; // ADD THIS LINE
+  onSeeAll: () => void;
 }> = ({ film, onSubmit, onSeeAll }) => {
   const [score, setScore] = useState<number>(8);
   const [useStars, setUseStars] = useState<boolean>(true);
@@ -258,10 +258,36 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
   const { channelId } = useChatStore(); // assumes store has { channelId }
   const [films, setFilms] = useState<Film[]>([]);
   const [idx, setIdx] = useState(0);
+  const [eventType, setEventType] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeModal === "ballot") setView("grid");
   }, [activeModal]);
+
+  // fetch channel metadata including event type
+  useEffect(() => {
+    let on = true;
+    (async () => {
+      if (!channelId) {
+        setEventType(null);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/channels/${encodeURIComponent(channelId)}`);
+        if (!res.ok) throw new Error("Failed to load channel");
+        const data = await res.json();
+        if (on) {
+          setEventType(data.event_type || null);
+        }
+      } catch (e) {
+        console.error(e);
+        if (on) setEventType(null);
+      }
+    })();
+    return () => {
+      on = false;
+    };
+  }, [channelId]);
 
   // fetch films whenever channel changes
   useEffect(() => {
@@ -294,12 +320,37 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
 
   const currentFilm: Film | null = films.length ? films[idx % films.length] : null;
   const [view, setView] = useState<"single" | "grid">("single");
-  const utilities = [
+
+  // All possible utilities
+  const allUtilities = [
     { key: "ballot" as const, name: "Voting Ballot", description: "Rate and support your favorite entries." },
     { key: "battle" as const, name: "Battle Royale", description: "Films go head-to-head. You decide the winner." },
-    { key: "bracket" as const, name: "Tournament Bracket", description: "See who’s advancing in the competition." },
-    { key: "leaderboard" as const, name: "All Time Leaderboard", description: "Top-ranked filmmakers." },
+    { key: "bracket" as const, name: "Tournament Bracket", description: "See who's advancing in the competition." },
+    { key: "leaderboard" as const, name: "Leaderboard", description: "Top-ranked filmmakers." },
   ];
+
+  // Filter utilities based on event type
+  const utilities = useMemo(() => {
+    if (!eventType) return []; // Show nothing if no event type
+
+    switch (eventType.toLowerCase()) {
+      case "film festival":
+      case "film_festival":
+        return allUtilities.filter(u => u.key === "ballot" || u.key === "leaderboard");
+
+      case "battle royal":
+      case "battle_royal":
+      case "battle royale":
+      case "battle_royale":
+        return allUtilities.filter(u => u.key === "battle");
+
+      case "tournament":
+        return allUtilities.filter(u => u.key === "bracket");
+
+      default:
+        return []; // Show nothing for unknown event types
+    }
+  }, [eventType]);
 
   const submitVote = async (payload: BallotSubmit) => {
     if (!channelId) return;

@@ -9,7 +9,7 @@ interface Props {
 }
 
 type VotingMode = "ratings" | "battle";
-type EventType = "film_festival";
+type EventType = "film_festival" | "battle_royal" | "tournament";
 
 type NewFilm = {
   title: string;
@@ -34,7 +34,7 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
   // event/festival
   const [addEvent, setAddEvent] = useState(false);
-  const [eventType] = useState<EventType>("film_festival"); // only one for now
+  const [eventType, setEventType] = useState<EventType>("film_festival");
   const [eventTitle, setEventTitle] = useState("");
   const [startsAt, setStartsAt] = useState<string>(""); // ISO datetime-local
   const [endsAt, setEndsAt] = useState<string>("");
@@ -159,6 +159,7 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
       setDisplayName("");
       setDescription("");
       setAddEvent(false);
+      setEventType("film_festival");
       setEventTitle("");
       setStartsAt("");
       setEndsAt("");
@@ -239,17 +240,24 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
           {addEvent && (
             <div className="festival-block">
-              {/* Event Type (fixed) */}
+              {/* Event Type - NOW ENABLED */}
               <div className="row">
-                <label>Type</label>
-                <select value={eventType} disabled>
+                <label htmlFor="event-type">Event Type</label>
+                <select
+                  id="event-type"
+                  value={eventType}
+                  onChange={(e) => setEventType(e.target.value as EventType)}
+                >
                   <option value="film_festival">Film Festival</option>
+                  <option value="battle_royal">Battle Royale</option>
+                  <option value="tournament">Tournament</option>
                 </select>
               </div>
 
               <div className="row">
-                <label>Event Name</label>
+                <label htmlFor="event-name">Event Name</label>
                 <input
+                  id="event-name"
                   type="text"
                   placeholder="e.g. DBTV Summer Shorts 2025"
                   value={eventTitle}
@@ -260,8 +268,9 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
               <div className="row cols-2">
                 <div>
-                  <label>Starts</label>
+                  <label htmlFor="starts-at">Starts</label>
                   <input
+                    id="starts-at"
                     type="datetime-local"
                     value={startsAt}
                     onChange={(e) => setStartsAt(e.target.value)}
@@ -269,8 +278,9 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
                   />
                 </div>
                 <div>
-                  <label>Ends</label>
+                  <label htmlFor="ends-at">Ends</label>
                   <input
+                    id="ends-at"
                     type="datetime-local"
                     value={endsAt}
                     onChange={(e) => setEndsAt(e.target.value)}
@@ -281,8 +291,12 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
               <div className="row cols-2">
                 <div>
-                  <label>Voting Mode</label>
-                  <select value={votingMode} onChange={(e) => setVotingMode(e.target.value as VotingMode)}>
+                  <label htmlFor="voting-mode">Voting Mode</label>
+                  <select
+                    id="voting-mode"
+                    value={votingMode}
+                    onChange={(e) => setVotingMode(e.target.value as VotingMode)}
+                  >
                     <option value="ratings">Ratings (1–10)</option>
                     <option value="battle">Battle (head‑to‑head)</option>
                   </select>
@@ -298,7 +312,7 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
               </div>
 
               <div className="films-header">
-                <h4>Films in this festival</h4>
+                <h4>Films in this event</h4>
                 <button type="button" className="btn-secondary small" onClick={addFilmRow}>+ Add Film</button>
               </div>
 
