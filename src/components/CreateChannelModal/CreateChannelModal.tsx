@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { authHeaders } from "../../api/client";
+import TournamentSeeding, { TournamentBracket } from "./TournamentSeeding";
 import "./CreateChannelModal.scss";
 
 interface Props {
@@ -43,6 +44,9 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
   // films
   const [films, setFilms] = useState<NewFilm[]>([{ ...emptyFilm }]);
+
+  // Tournament
+  const [tournamentBracket, setTournamentBracket] = useState<TournamentBracket | null>(null);
 
   // Generate available channel numbers (e.g., 2-99)
   const availableChannels = Array.from({ length: 199 }, (_, i) => i + 2);
@@ -90,7 +94,12 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
     if (!startsAt || !endsAt) return false;
     if (new Date(startsAt) >= new Date(endsAt)) return false;
     const validFilms = films.filter(f => f.title.trim().length > 0);
-    return validFilms.length > 0;
+    if (validFilms.length === 0) return false;
+
+    // ✅ For tournaments, require bracket to be set up
+    if (eventType === "tournament" && !tournamentBracket) return false;
+
+    return true;
   };
 
   const addFilmRow = () => setFilms(prev => [...prev, { ...emptyFilm }]);
@@ -131,6 +140,7 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
           ends_at: new Date(endsAt).toISOString(),
           voting_mode: votingMode,
           require_login: requireLogin,
+          tournament_bracket: eventType === "tournament" ? tournamentBracket : null,
         };
         body.films = normalizeFilms();
       }
@@ -166,6 +176,7 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
       setVotingMode("ratings");
       setRequireLogin(true);
       setFilms([{ ...emptyFilm }]);
+      setTournamentBracket(null);
       setSuccess(true);
     } catch (err) {
       console.error("Error submitting channel", err);
@@ -356,6 +367,24 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
                   </div>
                 ))}
               </div>
+
+              {/* ✅ TOURNAMENT SEEDING - Properly placed after films section */}
+              {eventType === "tournament" && films.filter(f => f.title.trim()).length > 0 && (
+                <div className="tournament-section">
+                  <TournamentSeeding
+                    films={films.filter(f => f.title.trim()).map((f, idx) => ({
+                      id: `temp-${idx}`, // Temporary ID for frontend
+                      title: f.title,
+                      creator: f.creator,
+                      thumbnail: f.thumbnail,
+                    }))}
+                    onSeedingComplete={(bracket) => {
+                      console.log("Bracket setup complete:", bracket);
+                      setTournamentBracket(bracket);
+                    }}
+                  />
+                </div>
+              )}
             </div>
           )}
 

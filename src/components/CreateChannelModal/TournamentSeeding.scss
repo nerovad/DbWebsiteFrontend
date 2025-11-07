@@ -1,0 +1,267 @@
+.tournament-seeding {
+  padding: 1.5rem;
+  background: #1a1a1a;
+  border-radius: 8px;
+  margin-top: 1rem;
+
+  .warning {
+    padding: 1rem;
+    background: rgba(255, 200, 0, 0.1);
+    border: 1px solid rgba(255, 200, 0, 0.3);
+    border-radius: 6px;
+    text-align: center;
+
+    p {
+      margin: 0.5rem 0;
+      color: #ffc800;
+    }
+  }
+
+  .seeding-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.25rem;
+    }
+
+    .seeding-mode-toggle {
+      display: flex;
+      gap: 0.5rem;
+
+      button {
+        padding: 0.5rem 1rem;
+        background: #2a2a2a;
+        border: 1px solid #3a3a3a;
+        border-radius: 4px;
+        color: #999;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #333;
+          border-color: #444;
+        }
+
+        &.active {
+          background: #0066cc;
+          border-color: #0066cc;
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .auto-seed-section,
+  .manual-seed-section {
+    margin-bottom: 1.5rem;
+
+    p {
+      margin-bottom: 1rem;
+      color: #ccc;
+    }
+
+    .btn-secondary {
+      padding: 0.5rem 1rem;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 4px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #333;
+        border-color: #444;
+      }
+    }
+  }
+
+  .seed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+
+    .seed-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 6px;
+      cursor: move;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #333;
+        border-color: #444;
+      }
+
+      .seed-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        background: #0066cc;
+        border-radius: 50%;
+        color: #fff;
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .seed-info {
+        flex: 1;
+
+        .seed-title {
+          color: #fff;
+          font-weight: 500;
+          margin-bottom: 0.25rem;
+        }
+
+        .seed-creator {
+          color: #999;
+          font-size: 0.85rem;
+        }
+      }
+
+      .drag-handle {
+        color: #666;
+        font-size: 1.25rem;
+        cursor: grab;
+
+        &:active {
+          cursor: grabbing;
+        }
+      }
+    }
+  }
+
+  .bracket-preview {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #242424;
+    border-radius: 8px;
+
+    h4 {
+      margin: 0 0 1rem 0;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+
+    .preview-info {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      color: #999;
+      font-size: 0.9rem;
+
+      span {
+        &:not(:first-child):not(:last-child) {
+          color: #555;
+        }
+      }
+    }
+
+    .first-round-matchups {
+      h5 {
+        margin: 0 0 1rem 0;
+        color: #ccc;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .matchup-preview {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: #1a1a1a;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+
+        .matchup-number {
+          min-width: 70px;
+          color: #999;
+          font-size: 0.85rem;
+          font-weight: 500;
+        }
+
+        .matchup-films {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex: 1;
+
+          .film {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+            padding: 0.5rem;
+            background: #2a2a2a;
+            border-radius: 4px;
+
+            .seed-badge {
+              display: inline-block;
+              min-width: 28px;
+              height: 28px;
+              line-height: 28px;
+              text-align: center;
+              background: #0066cc;
+              border-radius: 4px;
+              color: #fff;
+              font-size: 0.75rem;
+              font-weight: bold;
+            }
+
+            span:not(.seed-badge):not(.bye) {
+              color: #fff;
+              font-size: 0.9rem;
+            }
+
+            .bye {
+              color: #666;
+              font-style: italic;
+            }
+          }
+
+          .vs {
+            color: #666;
+            font-weight: bold;
+            font-size: 0.85rem;
+          }
+        }
+      }
+    }
+  }
+
+  .seeding-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+
+    .btn-primary {
+      padding: 0.75rem 1.5rem;
+      background: #0066cc;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #0052a3;
+      }
+    }
+  }
+}

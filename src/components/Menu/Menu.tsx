@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from "react";
 import "./Menu.scss";
 import RewindIcon from "../../assets/rewind_icon.svg";
 import { useChatStore } from "../../store/useChatStore";
+import TournamentBracket from "./TournamentBracket";
 
 /* === PROPS === */
 interface UtilitiesProps {
@@ -406,7 +407,30 @@ const Utilities: React.FC<UtilitiesProps> = ({ isOpen, setIsOpen }) => {
           )}
         </div>
       </div>
+
       {/* === MODALS === */}
+
+      {/* Tournament Bracket Modal */}
+      <Modal
+        isOpen={activeModal === "bracket"}
+        onClose={() => setActiveModal(null)}
+        title="🏆 Tournament Bracket"
+        width={1400}
+      >
+        <TournamentBracket
+          channelId={channelId}
+          onFilmClick={(filmId) => {
+            // Find the film and open voting modal
+            const film = films.find(f => f.id === filmId);
+            if (film) {
+              setIdx(films.indexOf(film));
+              setActiveModal("ballot");
+            }
+          }}
+        />
+      </Modal>
+
+      {/* Voting Ballot Modal */}
       <Modal
         isOpen={activeModal === "ballot"}
         onClose={() => setActiveModal(null)}
