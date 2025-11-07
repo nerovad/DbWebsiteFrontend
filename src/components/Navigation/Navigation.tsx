@@ -72,11 +72,12 @@ const SearchNavBar: React.FC<NavBarProps> = ({
     if (targetIndex !== -1) {
       setCurrentIndex(targetIndex);
       loadVideo(videoLinks[targetIndex].src);
+      // ⬅️ ADD THIS: Update the URL to match the channel
+      navigate(`/channel/${videoLinks[targetIndex].channel}`, { replace: true });
     } else {
       alert(`Channel ${targetChannelNumber} not found`);
     }
   };
-
   return (
     <div className="search-navbar">
       {/* Left Logo */}
