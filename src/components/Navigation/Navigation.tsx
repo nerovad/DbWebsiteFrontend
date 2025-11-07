@@ -9,6 +9,7 @@ import TvGuide from "../../assets/tv_guide_icon.svg"
 import Fullscreen from "../../assets/fullscreen_icon.svg"
 import Mute from "../../assets/mute_icon.svg"
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
+import { useChatStore } from "../../store/useChatStore";
 
 interface NavBarProps {
   isLoggedIn: boolean;
@@ -48,6 +49,7 @@ const SearchNavBar: React.FC<NavBarProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [channelInput, setChannelInput] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false); // ⬅️ modal state
+  const { setChannelId } = useChatStore();
 
   // Add this right at the top of the component, after the state declarations
   console.log("Current videoLinks:", videoLinks);
@@ -66,18 +68,19 @@ const SearchNavBar: React.FC<NavBarProps> = ({
       return;
     }
 
-    // Find the index of the video with this channel number
     const targetIndex = videoLinks.findIndex(v => v.channelNumber === targetChannelNumber);
 
     if (targetIndex !== -1) {
+      const targetChannel = videoLinks[targetIndex];
       setCurrentIndex(targetIndex);
-      loadVideo(videoLinks[targetIndex].src);
-      // ⬅️ ADD THIS: Update the URL to match the channel
-      navigate(`/channel/${videoLinks[targetIndex].channel}`, { replace: true });
+      loadVideo(targetChannel.src);
+      setChannelId(targetChannel.channel); // ⬅️ ADD THIS: Update the store
+      navigate(`/channel/${targetChannel.channel}`, { replace: true });
     } else {
       alert(`Channel ${targetChannelNumber} not found`);
     }
   };
+
   return (
     <div className="search-navbar">
       {/* Left Logo */}
