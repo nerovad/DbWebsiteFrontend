@@ -129,18 +129,16 @@ const TournamentBracket: React.FC<TournamentBracketProps> = ({ channelId, onFilm
 
   return (
     <div className="tournament-bracket">
-      <div className="bracket-header">
-        <h2>🏆 Tournament Bracket</h2>
-        <div className="tournament-status">
-          <span className={`status-badge ${tournament.status}`}>
-            {tournament.status}
+      {/* Compact status bar - Modal provides the main title */}
+      <div className="tournament-status-bar">
+        <span className={`status-badge ${tournament.status}`}>
+          {tournament.status}
+        </span>
+        {tournament.status === "active" && (
+          <span className="current-round">
+            Current: {getRoundName(tournament.currentRound, tournament.rounds.length)}
           </span>
-          {tournament.status === "active" && (
-            <span className="current-round">
-              Current: {getRoundName(tournament.currentRound, tournament.rounds.length)}
-            </span>
-          )}
-        </div>
+        )}
       </div>
 
       <div className="bracket-container">

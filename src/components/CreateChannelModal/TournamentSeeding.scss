@@ -1,19 +1,23 @@
+@import '../../styles/variables';
+
 .tournament-seeding {
   padding: 1.5rem;
-  background: #1a1a1a;
+  background: $background-color-secondary;
   border-radius: 8px;
   margin-top: 1rem;
+  border: 1px solid $border-color-primary;
 
   .warning {
     padding: 1rem;
-    background: rgba(255, 200, 0, 0.1);
-    border: 1px solid rgba(255, 200, 0, 0.3);
+    background: rgba($accent-secondary-color, 0.15);
+    border: 1px solid rgba($accent-secondary-color, 0.4);
     border-radius: 6px;
     text-align: center;
 
     p {
       margin: 0.5rem 0;
-      color: #ffc800;
+      color: $accent-secondary-color;
+      text-shadow: 0 0 10px rgba($accent-secondary-color, 0.5);
     }
   }
 
@@ -25,8 +29,9 @@
 
     h3 {
       margin: 0;
-      color: #fff;
+      color: $channel-text-color;
       font-size: 1.25rem;
+      text-shadow: 0 0 15px rgba($primary-color, 0.6);
     }
 
     .seeding-mode-toggle {
@@ -35,22 +40,26 @@
 
       button {
         padding: 0.5rem 1rem;
-        background: #2a2a2a;
-        border: 1px solid #3a3a3a;
+        background: $background-color-primary;
+        border: 1px solid $border-color-primary;
         border-radius: 4px;
-        color: #999;
+        color: $text-color-secondary;
         cursor: pointer;
         transition: all 0.2s;
+        font-family: $primary-font-family;
 
         &:hover {
-          background: #333;
-          border-color: #444;
+          background: lighten($background-color-primary, 5%);
+          border-color: $primary-color;
+          box-shadow: 0 0 10px rgba($primary-color, 0.3);
         }
 
         &.active {
-          background: #0066cc;
-          border-color: #0066cc;
-          color: #fff;
+          background: $primary-color;
+          border-color: $primary-color;
+          color: $channel-text-color;
+          text-shadow: 0 0 10px rgba($primary-color, 0.8);
+          box-shadow: 0 0 15px rgba($primary-color, 0.4);
         }
       }
     }
@@ -62,21 +71,24 @@
 
     p {
       margin-bottom: 1rem;
-      color: #ccc;
+      color: $text-color-secondary;
     }
 
     .btn-secondary {
       padding: 0.5rem 1rem;
-      background: #2a2a2a;
-      border: 1px solid #3a3a3a;
+      background: $background-color-primary;
+      border: 1px solid $border-color-primary;
       border-radius: 4px;
-      color: #fff;
+      color: $text-color-primary;
       cursor: pointer;
       transition: all 0.2s;
+      font-family: $primary-font-family;
 
       &:hover {
-        background: #333;
-        border-color: #444;
+        background: lighten($background-color-primary, 5%);
+        border-color: $secondary-color;
+        color: $secondary-color;
+        box-shadow: 0 0 15px rgba($secondary-color, 0.3);
       }
     }
   }
@@ -88,20 +100,39 @@
     max-height: 400px;
     overflow-y: auto;
 
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: $background-color-primary;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary-color;
+      border-radius: 4px;
+
+      &:hover {
+        background: lighten($primary-color, 10%);
+      }
+    }
+
     .seed-item {
       display: flex;
       align-items: center;
       gap: 1rem;
       padding: 0.75rem 1rem;
-      background: #2a2a2a;
-      border: 1px solid #3a3a3a;
+      background: $background-color-primary;
+      border: 1px solid $border-color-primary;
       border-radius: 6px;
       cursor: move;
       transition: all 0.2s;
 
       &:hover {
-        background: #333;
-        border-color: #444;
+        background: lighten($background-color-primary, 5%);
+        border-color: $primary-color;
+        box-shadow: 0 0 10px rgba($primary-color, 0.3);
       }
 
       .seed-number {
@@ -110,35 +141,38 @@
         justify-content: center;
         min-width: 40px;
         height: 40px;
-        background: #0066cc;
+        background: $primary-color;
         border-radius: 50%;
-        color: #fff;
+        color: $channel-text-color;
         font-weight: bold;
         font-size: 0.9rem;
+        text-shadow: 0 0 10px rgba($primary-color, 0.8);
+        box-shadow: 0 0 10px rgba($primary-color, 0.4);
       }
 
       .seed-info {
         flex: 1;
 
         .seed-title {
-          color: #fff;
+          color: $text-color-primary;
           font-weight: 500;
           margin-bottom: 0.25rem;
         }
 
         .seed-creator {
-          color: #999;
+          color: $text-color-secondary;
           font-size: 0.85rem;
         }
       }
 
       .drag-handle {
-        color: #666;
+        color: $text-color-secondary;
         font-size: 1.25rem;
         cursor: grab;
 
         &:active {
           cursor: grabbing;
+          color: $primary-color;
         }
       }
     }
@@ -147,25 +181,27 @@
   .bracket-preview {
     margin-top: 2rem;
     padding: 1.5rem;
-    background: #242424;
+    background: $background-color-primary;
     border-radius: 8px;
+    border: 1px solid $border-color-primary;
 
     h4 {
       margin: 0 0 1rem 0;
-      color: #fff;
+      color: $channel-text-color;
       font-size: 1.1rem;
+      text-shadow: 0 0 10px rgba($secondary-color, 0.5);
     }
 
     .preview-info {
       display: flex;
       gap: 0.75rem;
       margin-bottom: 1.5rem;
-      color: #999;
+      color: $text-color-secondary;
       font-size: 0.9rem;
 
       span {
         &:not(:first-child):not(:last-child) {
-          color: #555;
+          color: $text-color-secondary;
         }
       }
     }
@@ -173,7 +209,7 @@
     .first-round-matchups {
       h5 {
         margin: 0 0 1rem 0;
-        color: #ccc;
+        color: $text-color-primary;
         font-size: 0.95rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -184,13 +220,19 @@
         align-items: center;
         gap: 1rem;
         padding: 0.75rem;
-        background: #1a1a1a;
+        background: $background-color-secondary;
         border-radius: 6px;
         margin-bottom: 0.5rem;
+        border: 1px solid $border-color-primary;
+
+        &:hover {
+          border-color: $primary-color;
+          box-shadow: 0 0 8px rgba($primary-color, 0.2);
+        }
 
         .matchup-number {
           min-width: 70px;
-          color: #999;
+          color: $text-color-secondary;
           font-size: 0.85rem;
           font-weight: 500;
         }
@@ -207,8 +249,9 @@
             gap: 0.5rem;
             flex: 1;
             padding: 0.5rem;
-            background: #2a2a2a;
+            background: $background-color-primary;
             border-radius: 4px;
+            border: 1px solid $border-color-primary;
 
             .seed-badge {
               display: inline-block;
@@ -216,26 +259,28 @@
               height: 28px;
               line-height: 28px;
               text-align: center;
-              background: #0066cc;
+              background: $primary-color;
               border-radius: 4px;
-              color: #fff;
+              color: $channel-text-color;
               font-size: 0.75rem;
               font-weight: bold;
+              text-shadow: 0 0 8px rgba($primary-color, 0.6);
+              box-shadow: 0 0 8px rgba($primary-color, 0.3);
             }
 
             span:not(.seed-badge):not(.bye) {
-              color: #fff;
+              color: $text-color-primary;
               font-size: 0.9rem;
             }
 
             .bye {
-              color: #666;
+              color: $text-color-secondary;
               font-style: italic;
             }
           }
 
           .vs {
-            color: #666;
+            color: $text-color-secondary;
             font-weight: bold;
             font-size: 0.85rem;
           }
@@ -251,16 +296,25 @@
 
     .btn-primary {
       padding: 0.75rem 1.5rem;
-      background: #0066cc;
+      background: $primary-color;
       border: none;
       border-radius: 6px;
-      color: #fff;
+      color: $channel-text-color;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
+      font-family: $primary-font-family;
+      text-shadow: 0 0 10px rgba($primary-color, 0.8);
+      box-shadow: 0 0 15px rgba($primary-color, 0.4);
 
       &:hover {
-        background: #0052a3;
+        background: lighten($primary-color, 10%);
+        box-shadow: 0 0 25px rgba($primary-color, 0.6);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(0);
       }
     }
   }
