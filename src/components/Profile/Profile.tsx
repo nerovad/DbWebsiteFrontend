@@ -4,6 +4,7 @@ import AvatarPicker from "./AvatarPicker";
 import CreateChannelModal from "../CreateChannelModal/CreateChannelModal";
 import Messages from "./Messages";
 import EditChannelModal from "../EditChannelModal/EditChannelModal";
+import TournamentConsole from "./TournamentConsole";
 import { useApi } from "../../utils/useApi";
 import Logo from "../../assets/cinezoo_logo_neon_7.svg";
 
@@ -17,12 +18,14 @@ try {
 type Channel = {
   id: string;
   name: string;
-  display_name?: string;  // ADD THIS
+  display_name?: string;
   channel_number?: number;
   slug?: string;
   description?: string;
   isLive?: boolean;
   thumbnail?: string;
+  event_type?: string;
+  session_id?: string;
 };
 
 type Film = {
@@ -105,6 +108,9 @@ const Profile: React.FC = () => {
 
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [deletingChannelId, setDeletingChannelId] = useState<string | null>(null);
+
+  // Tournament Console modal state
+  const [tournamentConsoleChannel, setTournamentConsoleChannel] = useState<Channel | null>(null);
 
   // Pull channels from your store if available
   const storeChannels = useMemo(() => {
@@ -428,6 +434,17 @@ const Profile: React.FC = () => {
                         >
                           Edit
                         </button>
+
+                        {/* Manager button - opens modal instead of navigating */}
+                        {ch.event_type?.toLowerCase() === 'tournament' && ch.session_id && (
+                          <button
+                            className="btn btn-manager"
+                            onClick={() => setTournamentConsoleChannel(ch)}
+                          >
+                            Manager
+                          </button>
+                        )}
+
                         <button
                           className="btn danger"
                           onClick={() => handleDeleteChannel(ch.id, ch.display_name || ch.name)}
@@ -504,6 +521,8 @@ const Profile: React.FC = () => {
           </section>
         )}
       </div>
+
+      {/* Modals */}
       <CreateChannelModal
         isOpen={isCreateChannelOpen}
         onClose={() => setIsCreateChannelOpen(false)}
@@ -522,6 +541,17 @@ const Profile: React.FC = () => {
         onSelect={handleAvatarSelect}
         currentAvatar={profile.avatarUrl}
       />
+
+      {/* Tournament Console Modal */}
+      {
+        tournamentConsoleChannel && (
+          <TournamentConsole
+            channelId={tournamentConsoleChannel.id}
+            sessionId={tournamentConsoleChannel.session_id!}
+            onClose={() => setTournamentConsoleChannel(null)}
+          />
+        )
+      }
     </div >
   );
 };

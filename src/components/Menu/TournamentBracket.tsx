@@ -1,19 +1,7 @@
-import React, { useState, useEffect } from "react";
-import "./TournamentBracket.scss";
+import React, { useEffect, useState } from 'react';
+import './TournamentBracket.scss';
 
-interface TournamentBracketProps {
-  channelId: string;
-  onFilmClick: (filmId: string) => void;
-}
-
-export interface Film {
-  id: string;
-  title: string;
-  creator?: string;
-  thumbnail?: string;
-}
-
-export interface FilmSeed {
+interface Film {
   filmId: string;
   seed: number;
   title: string;
@@ -21,255 +9,320 @@ export interface FilmSeed {
   thumbnail?: string;
 }
 
-export interface Matchup {
+interface Matchup {
   id: string;
   position: number;
   roundNumber: number;
-  film1: FilmSeed | null;
-  film2: FilmSeed | null;
-  winner?: string; // film id
-  votes1?: number;
-  votes2?: number;
+  film1: Film | null;
+  film2: Film | null;
+  votes1: number;
+  votes2: number;
+  winner?: string;
+  dbMatchupId?: string;
 }
 
-export interface Round {
+interface Round {
   roundNumber: number;
   roundName: string;
   matchups: Matchup[];
 }
 
-export interface TournamentData {
+interface TournamentData {
   id: string;
+  channelName: string;
   status: "upcoming" | "active" | "completed";
   currentRound: number;
   rounds: Round[];
+  startsAt: string;
+  endsAt: string;
+  votingWindow?: {
+    isActive: boolean;
+    currentRound: number | null;
+  };
 }
 
-const TournamentBracket: React.FC<TournamentBracketProps> = ({ channelId, onFilmClick }) => {
+interface Props {
+  channelId: string;
+}
+
+const TournamentBracket: React.FC<Props> = ({ channelId }) => {
   const [tournament, setTournament] = useState<TournamentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [votingFor, setVotingFor] = useState<string | null>(null);
+  const [userVotes, setUserVotes] = useState<Record<string, string>>({}); // matchupId -> filmId
 
   useEffect(() => {
-    fetchTournament();
+    loadTournament();
   }, [channelId]);
 
-  const fetchTournament = async () => {
+  const loadTournament = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("token");
+      setError(null);
+
       const response = await fetch(`/api/channels/${channelId}/tournament`, {
         headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-        credentials: "include",
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
 
       if (!response.ok) {
-        throw new Error("Failed to load tournament data");
+        throw new Error('Failed to load tournament');
       }
 
       const data = await response.json();
+      console.log('Tournament data received:', data);
       setTournament(data);
-      setError(null);
     } catch (err) {
-      console.error("Error fetching tournament:", err);
-      setError(err instanceof Error ? err.message : "Failed to load tournament");
+      console.error('Error loading tournament:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
   };
 
-  const getRoundName = (roundNumber: number, totalRounds: number): string => {
-    const roundsFromEnd = totalRounds - roundNumber;
+  const handleFilmClick = async (matchup: Matchup, filmId: string) => {
+    // Check if voting is active
+    if (!tournament?.votingWindow?.isActive) {
+      alert('Voting is not currently active');
+      return;
+    }
 
-    if (roundsFromEnd === 0) return "Finals";
-    if (roundsFromEnd === 1) return "Semi-Finals";
-    if (roundsFromEnd === 2) return "Quarter-Finals";
+    if (tournament.votingWindow.currentRound !== matchup.roundNumber) {
+      alert(`Voting is active for Round ${tournament.votingWindow.currentRound}, not Round ${matchup.roundNumber}`);
+      return;
+    }
 
-    return `Round ${roundNumber}`;
+    // Check if matchup is already completed
+    if (matchup.winner) {
+      alert('This matchup has already been decided');
+      return;
+    }
+
+    // Check if user already voted
+    if (userVotes[matchup.dbMatchupId || matchup.id]) {
+      alert('You have already voted in this matchup');
+      return;
+    }
+
+    try {
+      setVotingFor(matchup.dbMatchupId || matchup.id);
+
+      const response = await fetch(`/api/tournaments/matchups/${matchup.dbMatchupId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ filmId })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit vote');
+      }
+
+      // Mark that user voted for this matchup
+      setUserVotes(prev => ({ ...prev, [matchup.dbMatchupId || matchup.id]: filmId }));
+
+      // Reload tournament to get updated vote counts
+      await loadTournament();
+    } catch (err) {
+      console.error('Error voting:', err);
+      alert(err instanceof Error ? err.message : 'Failed to submit vote');
+    } finally {
+      setVotingFor(null);
+    }
   };
 
-  const getWinnerPercentage = (votes1: number = 0, votes2: number = 0): [number, number] => {
-    const total = votes1 + votes2;
-    if (total === 0) return [50, 50];
-
-    return [
-      Math.round((votes1 / total) * 100),
-      Math.round((votes2 / total) * 100)
-    ];
+  const getVotePercentage = (votes: number, totalVotes: number): number => {
+    if (totalVotes === 0) return 0;
+    return Math.round((votes / totalVotes) * 100);
   };
 
   if (loading) {
     return (
-      <div className="tournament-bracket">
-        <div className="loading">Loading tournament bracket...</div>
+      <div className="tournament-bracket loading">
+        <div className="spinner">Loading tournament...</div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !tournament) {
     return (
-      <div className="tournament-bracket">
-        <div className="error">
-          <p>⚠️ {error}</p>
-          <button onClick={fetchTournament}>Retry</button>
-        </div>
+      <div className="tournament-bracket error">
+        <p>Error: {error || 'Tournament not found'}</p>
       </div>
     );
   }
 
-  if (!tournament) {
+  // Additional check for rounds data
+  if (!tournament.rounds || tournament.rounds.length === 0) {
     return (
-      <div className="tournament-bracket">
-        <div className="empty">No tournament data available</div>
+      <div className="tournament-bracket error">
+        <p>No tournament rounds available. The tournament may not be set up yet.</p>
       </div>
     );
   }
+
+  const { status, currentRound, rounds, votingWindow } = tournament;
 
   return (
     <div className="tournament-bracket">
-      {/* Compact status bar - Modal provides the main title */}
+      {/* Status Bar */}
       <div className="tournament-status-bar">
-        <span className={`status-badge ${tournament.status}`}>
-          {tournament.status}
-        </span>
-        {tournament.status === "active" && (
-          <span className="current-round">
-            Current: {getRoundName(tournament.currentRound, tournament.rounds.length)}
-          </span>
+        {status === 'completed' ? (
+          <div className="status-badge complete">
+            Tournament Complete
+          </div>
+        ) : (
+          <>
+            <div className="status-badge in-progress">
+              Round {currentRound} of {rounds.length}
+            </div>
+            {votingWindow && (
+              <div className={`voting-status ${votingWindow.isActive ? 'active' : 'inactive'}`}>
+                {votingWindow.isActive ? (
+                  <>🟢 Voting Active (Round {votingWindow.currentRound})</>
+                ) : (
+                  <>⚫ Voting Closed</>
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
 
+      {/* Bracket Grid */}
       <div className="bracket-container">
-        <div className="rounds">
-          {tournament.rounds.map((round) => (
-            <div key={round.roundNumber} className="round">
-              <div className="round-header">
-                <h3>{getRoundName(round.roundNumber, tournament.rounds.length)}</h3>
-                <span className="round-count">{round.matchups.length} match{round.matchups.length !== 1 ? 'es' : ''}</span>
-              </div>
+        {rounds.map((round, roundIndex) => (
+          <div key={roundIndex} className="bracket-round">
+            <div className="round-header">
+              {round.roundName}
+            </div>
+            <div className="matchups">
+              {round.matchups.map((matchup) => {
+                const totalVotes = matchup.votes1 + matchup.votes2;
+                const isVotingActive =
+                  votingWindow?.isActive &&
+                  votingWindow.currentRound === matchup.roundNumber &&
+                  !matchup.winner;
+                const userVoted = !!userVotes[matchup.dbMatchupId || matchup.id];
 
-              <div className="matchups">
-                {round.matchups.map((matchup) => {
-                  const [pct1, pct2] = getWinnerPercentage(matchup.votes1, matchup.votes2);
-                  const isActive = tournament.status === "active" && round.roundNumber === tournament.currentRound;
-                  const hasWinner = !!matchup.winner;
-
-                  return (
-                    <div
-                      key={matchup.id}
-                      className={`matchup ${isActive ? 'active' : ''} ${hasWinner ? 'completed' : ''}`}
-                    >
-                      <div className="matchup-number">Match {matchup.position + 1}</div>
-
-                      {/* Film 1 */}
+                return (
+                  <div key={matchup.id} className="matchup">
+                    {/* Film 1 */}
+                    {matchup.film1 ? (
                       <div
-                        className={`competitor ${matchup.winner === matchup.film1?.filmId ? 'winner' : ''} ${!matchup.film1 ? 'bye' : ''}`}
-                        onClick={() => matchup.film1 && isActive && onFilmClick(matchup.film1.filmId)}
-                        style={{ cursor: matchup.film1 && isActive ? 'pointer' : 'default' }}
+                        className={`film-slot ${matchup.winner === matchup.film1.filmId ? 'winner' : ''
+                          } ${userVotes[matchup.dbMatchupId || matchup.id] === matchup.film1.filmId ? 'user-voted' : ''
+                          } ${isVotingActive ? 'votable' : ''
+                          } ${votingFor === (matchup.dbMatchupId || matchup.id) ? 'voting' : ''
+                          }`}
+                        onClick={() => {
+                          if (isVotingActive && !userVoted) {
+                            handleFilmClick(matchup, matchup.film1!.filmId);
+                          }
+                        }}
                       >
-                        {matchup.film1 ? (
-                          <>
-                            <div className="film-info">
-                              <span className="seed">#{matchup.film1.seed}</span>
-                              <div className="film-details">
-                                <div className="film-title">{matchup.film1.title}</div>
-                                {matchup.film1.creator && (
-                                  <div className="film-creator">{matchup.film1.creator}</div>
-                                )}
-                              </div>
-                            </div>
-                            {isActive && matchup.votes1 !== undefined && (
-                              <div className="votes">
-                                <span className="vote-count">{matchup.votes1}</span>
-                                <span className="vote-pct">{pct1}%</span>
-                              </div>
-                            )}
-                            {hasWinner && matchup.winner === matchup.film1.filmId && (
-                              <div className="winner-badge">✓</div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="bye-text">BYE</div>
+                        <div className="film-seed">#{matchup.film1.seed}</div>
+                        {matchup.film1.thumbnail && (
+                          <img
+                            src={matchup.film1.thumbnail}
+                            alt={matchup.film1.title}
+                            className="film-thumbnail"
+                          />
                         )}
-                      </div>
-
-                      <div className="vs-divider">
-                        <span>vs</span>
-                        {isActive && (matchup.votes1 !== undefined || matchup.votes2 !== undefined) && (
-                          <div className="vote-bar">
-                            <div
-                              className="vote-fill film1"
-                              style={{ width: `${pct1}%` }}
-                            />
-                            <div
-                              className="vote-fill film2"
-                              style={{ width: `${pct2}%` }}
-                            />
+                        <div className="film-info">
+                          <h3 className="film-title">{matchup.film1.title}</h3>
+                          {matchup.film1.creator && (
+                            <p className="film-creator">{matchup.film1.creator}</p>
+                          )}
+                        </div>
+                        {totalVotes > 0 && (
+                          <div className="vote-stats">
+                            <div className="vote-count">{matchup.votes1} votes</div>
+                            <div className="vote-bar">
+                              <div
+                                className="vote-fill"
+                                style={{ width: `${getVotePercentage(matchup.votes1, totalVotes)}%` }}
+                              />
+                            </div>
+                            <div className="vote-pct">
+                              {getVotePercentage(matchup.votes1, totalVotes)}%
+                            </div>
                           </div>
                         )}
                       </div>
+                    ) : (
+                      <div className="film-slot bye">BYE</div>
+                    )}
 
-                      {/* Film 2 */}
+                    {/* VS Divider */}
+                    <div className="vs-divider">VS</div>
+
+                    {/* Film 2 */}
+                    {matchup.film2 ? (
                       <div
-                        className={`competitor ${matchup.winner === matchup.film2?.filmId ? 'winner' : ''} ${!matchup.film2 ? 'bye' : ''}`}
-                        onClick={() => matchup.film2 && isActive && onFilmClick(matchup.film2.filmId)}
-                        style={{ cursor: matchup.film2 && isActive ? 'pointer' : 'default' }}
+                        className={`film-slot ${matchup.winner === matchup.film2.filmId ? 'winner' : ''
+                          } ${userVotes[matchup.dbMatchupId || matchup.id] === matchup.film2.filmId ? 'user-voted' : ''
+                          } ${isVotingActive ? 'votable' : ''
+                          } ${votingFor === (matchup.dbMatchupId || matchup.id) ? 'voting' : ''
+                          }`}
+                        onClick={() => {
+                          if (isVotingActive && !userVoted) {
+                            handleFilmClick(matchup, matchup.film2!.filmId);
+                          }
+                        }}
                       >
-                        {matchup.film2 ? (
-                          <>
-                            <div className="film-info">
-                              <span className="seed">#{matchup.film2.seed}</span>
-                              <div className="film-details">
-                                <div className="film-title">{matchup.film2.title}</div>
-                                {matchup.film2.creator && (
-                                  <div className="film-creator">{matchup.film2.creator}</div>
-                                )}
-                              </div>
+                        <div className="film-seed">#{matchup.film2.seed}</div>
+                        {matchup.film2.thumbnail && (
+                          <img
+                            src={matchup.film2.thumbnail}
+                            alt={matchup.film2.title}
+                            className="film-thumbnail"
+                          />
+                        )}
+                        <div className="film-info">
+                          <h3 className="film-title">{matchup.film2.title}</h3>
+                          {matchup.film2.creator && (
+                            <p className="film-creator">{matchup.film2.creator}</p>
+                          )}
+                        </div>
+                        {totalVotes > 0 && (
+                          <div className="vote-stats">
+                            <div className="vote-count">{matchup.votes2} votes</div>
+                            <div className="vote-bar">
+                              <div
+                                className="vote-fill"
+                                style={{ width: `${getVotePercentage(matchup.votes2, totalVotes)}%` }}
+                              />
                             </div>
-                            {isActive && matchup.votes2 !== undefined && (
-                              <div className="votes">
-                                <span className="vote-count">{matchup.votes2}</span>
-                                <span className="vote-pct">{pct2}%</span>
-                              </div>
-                            )}
-                            {hasWinner && matchup.winner === matchup.film2.filmId && (
-                              <div className="winner-badge">✓</div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="bye-text">BYE</div>
+                            <div className="vote-pct">
+                              {getVotePercentage(matchup.votes2, totalVotes)}%
+                            </div>
+                          </div>
                         )}
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    ) : (
+                      <div className="film-slot bye">BYE</div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
 
-      {tournament.status === "completed" && tournament.rounds[tournament.rounds.length - 1].matchups[0].winner && (
+      {/* Champion Banner */}
+      {status === 'completed' && (
         <div className="champion-banner">
-          <div className="champion-content">
-            <h2>🏆 Champion</h2>
-            <div className="champion-film">
-              {(() => {
-                const finalMatchup = tournament.rounds[tournament.rounds.length - 1].matchups[0];
-                const champion = finalMatchup.winner === finalMatchup.film1?.filmId
-                  ? finalMatchup.film1
-                  : finalMatchup.film2;
-
-                return champion ? (
-                  <>
-                    <div className="champion-title">{champion.title}</div>
-                    {champion.creator && <div className="champion-creator">by {champion.creator}</div>}
-                  </>
-                ) : null;
-              })()}
-            </div>
+          <div className="champion-trophy">🏆</div>
+          <div className="champion-details">
+            <h2>Tournament Complete!</h2>
+            <p>Check the bracket above to see the champion</p>
           </div>
         </div>
       )}
