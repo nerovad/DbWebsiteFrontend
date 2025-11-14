@@ -9,7 +9,6 @@ interface Props {
   excludeClickId?: string;
 }
 
-type VotingMode = "ratings" | "battle";
 type EventType = "film_festival" | "battle_royal" | "tournament";
 
 type NewFilm = {
@@ -39,8 +38,6 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
   const [eventTitle, setEventTitle] = useState("");
   const [startsAt, setStartsAt] = useState<string>(""); // ISO datetime-local
   const [endsAt, setEndsAt] = useState<string>("");
-  const [votingMode, setVotingMode] = useState<VotingMode>("ratings");
-  const [requireLogin, setRequireLogin] = useState<boolean>(true);
 
   // films
   const [films, setFilms] = useState<NewFilm[]>([{ ...emptyFilm }]);
@@ -138,8 +135,7 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
           title: eventTitle,
           starts_at: new Date(startsAt).toISOString(),
           ends_at: new Date(endsAt).toISOString(),
-          voting_mode: votingMode,
-          require_login: requireLogin,
+          // ✅ voting_mode and require_login are now auto-determined by backend!
           tournament_bracket: eventType === "tournament" ? tournamentBracket : null,
         };
         body.films = normalizeFilms();
@@ -173,8 +169,6 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
       setEventTitle("");
       setStartsAt("");
       setEndsAt("");
-      setVotingMode("ratings");
-      setRequireLogin(true);
       setFilms([{ ...emptyFilm }]);
       setTournamentBracket(null);
       setSuccess(true);
@@ -251,7 +245,7 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
 
           {addEvent && (
             <div className="festival-block">
-              {/* Event Type - NOW ENABLED */}
+              {/* Event Type */}
               <div className="row">
                 <label htmlFor="event-type">Event Type</label>
                 <select
@@ -259,10 +253,13 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
                   value={eventType}
                   onChange={(e) => setEventType(e.target.value as EventType)}
                 >
-                  <option value="film_festival">Film Festival</option>
-                  <option value="battle_royal">Battle Royale</option>
-                  <option value="tournament">Tournament</option>
+                  <option value="film_festival">Film Festival (Ratings 1-10)</option>
+                  <option value="battle_royal">Battle Royale (Head-to-Head)</option>
+                  <option value="tournament">Tournament (Bracket)</option>
                 </select>
+                <small className="form-hint">
+                  Voting mode is automatically set based on event type. Login always required.
+                </small>
               </div>
 
               <div className="row">
@@ -298,28 +295,6 @@ const CreateChannelModal: React.FC<Props> = ({ isOpen, onClose, excludeClickId }
                     required
                   />
                 </div>
-              </div>
-
-              <div className="row cols-2">
-                <div>
-                  <label htmlFor="voting-mode">Voting Mode</label>
-                  <select
-                    id="voting-mode"
-                    value={votingMode}
-                    onChange={(e) => setVotingMode(e.target.value as VotingMode)}
-                  >
-                    <option value="ratings">Ratings (1–10)</option>
-                    <option value="battle">Battle (head‑to‑head)</option>
-                  </select>
-                </div>
-                <label className="checkbox-row" style={{ alignSelf: "end" }}>
-                  <input
-                    type="checkbox"
-                    checked={requireLogin}
-                    onChange={(e) => setRequireLogin(e.target.checked)}
-                  />
-                  <span>Require login to vote</span>
-                </label>
               </div>
 
               <div className="films-header">
