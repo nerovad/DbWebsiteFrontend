@@ -109,13 +109,14 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
     try {
       setVotingFor(matchup.dbMatchupId || matchup.id);
 
+      // ✅ FIX: Send film_id instead of filmId to match backend expectation
       const response = await fetch(`/api/tournaments/matchups/${matchup.dbMatchupId}/vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ filmId })
+        body: JSON.stringify({ film_id: filmId })
       });
 
       if (!response.ok) {
