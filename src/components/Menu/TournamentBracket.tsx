@@ -54,6 +54,10 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
 
   useEffect(() => {
     loadTournament();
+
+    // ✅ Poll for updates every 5 seconds to catch round changes
+    const interval = setInterval(loadTournament, 5000);
+    return () => clearInterval(interval);
   }, [channelId]);
 
   const loadTournament = async () => {
