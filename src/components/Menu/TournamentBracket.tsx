@@ -52,6 +52,7 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
   const [votingFor, setVotingFor] = useState<string | null>(null);
   const [userVotes, setUserVotes] = useState<Record<string, string>>({}); // matchupId -> filmId
   const [showConfetti, setShowConfetti] = useState(false);
+  const [hasShownConfetti, setHasShownConfetti] = useState(false);
 
   useEffect(() => {
     loadTournament();
@@ -61,15 +62,42 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
     return () => clearInterval(interval);
   }, [channelId]);
 
-  // Trigger confetti when tournament completes
+  // Helper function to find the champion
+  const getChampion = (): { film: Film; matchup: Matchup } | null => {
+    if (!tournament || !tournament.rounds || tournament.rounds.length === 0) return null;
+
+    const finalRound = tournament.rounds[tournament.rounds.length - 1];
+    if (!finalRound || finalRound.matchups.length === 0) return null;
+
+    const finalMatchup = finalRound.matchups[0];
+    if (!finalMatchup.winner) return null;
+
+    const championFilm = finalMatchup.winner === finalMatchup.film1?.filmId
+      ? finalMatchup.film1
+      : finalMatchup.film2;
+
+    if (!championFilm) return null;
+
+    return { film: championFilm, matchup: finalMatchup };
+  };
+
+  // Check if tournament has a champion (final round winner exists)
+  const hasChampion = (): boolean => {
+    return getChampion() !== null;
+  };
+
+  // Trigger confetti when a champion is crowned
   useEffect(() => {
-    if (tournament?.status === 'completed' && !showConfetti) {
+    if (tournament && hasChampion() && !hasShownConfetti) {
+      console.log('🎉 Champion detected! Triggering confetti...');
       setShowConfetti(true);
+      setHasShownConfetti(true);
+
       // Auto-hide confetti after 10 seconds
       const timer = setTimeout(() => setShowConfetti(false), 10000);
       return () => clearTimeout(timer);
     }
-  }, [tournament?.status]);
+  }, [tournament, hasShownConfetti]);
 
   const loadTournament = async () => {
     try {
@@ -176,25 +204,6 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
     return Math.round((votes / totalVotes) * 100);
   };
 
-  // Helper function to find the champion
-  const getChampion = (): { film: Film; matchup: Matchup } | null => {
-    if (!tournament || tournament.status !== 'completed') return null;
-
-    const finalRound = tournament.rounds[tournament.rounds.length - 1];
-    if (!finalRound || finalRound.matchups.length === 0) return null;
-
-    const finalMatchup = finalRound.matchups[0];
-    if (!finalMatchup.winner) return null;
-
-    const championFilm = finalMatchup.winner === finalMatchup.film1?.filmId
-      ? finalMatchup.film1
-      : finalMatchup.film2;
-
-    if (!championFilm) return null;
-
-    return { film: championFilm, matchup: finalMatchup };
-  };
-
   if (loading) {
     return (
       <div className="tournament-bracket loading">
@@ -222,6 +231,7 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
 
   const { status, currentRound, rounds, votingWindow } = tournament;
   const champion = getChampion();
+  const tournamentHasChampion = hasChampion();
 
   return (
     <div className="tournament-bracket">
@@ -244,7 +254,11 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
 
       {/* Status Bar */}
       <div className="tournament-status-bar">
-        {status === 'completed' ? (
+        {tournamentHasChampion ? (
+          <div className="status-badge complete">
+            🏆 Champion Crowned!
+          </div>
+        ) : status === 'completed' ? (
           <div className="status-badge complete">
             Tournament Complete
           </div>
@@ -388,8 +402,8 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
         ))}
       </div>
 
-      {/* Champion Banner - ENHANCED */}
-      {status === 'completed' && champion && (
+      {/* Champion Banner - Shows when final round has a winner */}
+      {tournamentHasChampion && champion && (
         <div className="champion-banner">
           <div className="champion-trophy">🏆</div>
           <div className="champion-details">
