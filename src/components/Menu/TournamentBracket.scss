@@ -182,10 +182,10 @@
         background: rgba($accent-secondary-color, 0.1);
         
         &::after {
-          content: '✓ VOTED';
+          content: '✓';
           position: absolute;
           top: 0.5rem;
-          right: 0.5rem;
+          right: 5rem;
           font-size: 0.7rem;
           font-weight: bold;
           color: $accent-secondary-color;

@@ -104,32 +104,51 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
       return;
     }
 
-    // Check if user already voted
-    if (userVotes[matchup.dbMatchupId || matchup.id]) {
-      alert('You have already voted in this matchup');
-      return;
-    }
+    const matchupKey = matchup.dbMatchupId || matchup.id;
+    const currentVote = userVotes[matchupKey];
 
     try {
-      setVotingFor(matchup.dbMatchupId || matchup.id);
+      setVotingFor(matchupKey);
 
-      // ✅ FIX: Send film_id instead of filmId to match backend expectation
-      const response = await fetch(`/api/tournaments/matchups/${matchup.dbMatchupId}/vote`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ film_id: filmId })
-      });
+      // If clicking the same film they already voted for, undo the vote
+      if (currentVote === filmId) {
+        const response = await fetch(`/api/tournaments/matchups/${matchup.dbMatchupId}/vote`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to submit vote');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to undo vote');
+        }
+
+        // Remove the vote from userVotes
+        setUserVotes(prev => {
+          const updated = { ...prev };
+          delete updated[matchupKey];
+          return updated;
+        });
+      } else {
+        // Either voting for the first time or switching to a different film
+        const response = await fetch(`/api/tournaments/matchups/${matchup.dbMatchupId}/vote`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ film_id: filmId })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to submit vote');
+        }
+
+        // Update userVotes with the new film
+        setUserVotes(prev => ({ ...prev, [matchupKey]: filmId }));
       }
-
-      // Mark that user voted for this matchup
-      setUserVotes(prev => ({ ...prev, [matchup.dbMatchupId || matchup.id]: filmId }));
 
       // Reload tournament to get updated vote counts
       await loadTournament();
@@ -226,7 +245,7 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
                           } ${votingFor === (matchup.dbMatchupId || matchup.id) ? 'voting' : ''
                           }`}
                         onClick={() => {
-                          if (isVotingActive && !userVoted) {
+                          if (isVotingActive) {
                             handleFilmClick(matchup, matchup.film1!.filmId);
                           }
                         }}
@@ -276,7 +295,7 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
                           } ${votingFor === (matchup.dbMatchupId || matchup.id) ? 'voting' : ''
                           }`}
                         onClick={() => {
-                          if (isVotingActive && !userVoted) {
+                          if (isVotingActive) {
                             handleFilmClick(matchup, matchup.film2!.filmId);
                           }
                         }}
