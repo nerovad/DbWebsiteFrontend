@@ -51,6 +51,7 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
   const [error, setError] = useState<string | null>(null);
   const [votingFor, setVotingFor] = useState<string | null>(null);
   const [userVotes, setUserVotes] = useState<Record<string, string>>({}); // matchupId -> filmId
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     loadTournament();
@@ -59,6 +60,16 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
     const interval = setInterval(loadTournament, 5000);
     return () => clearInterval(interval);
   }, [channelId]);
+
+  // Trigger confetti when tournament completes
+  useEffect(() => {
+    if (tournament?.status === 'completed' && !showConfetti) {
+      setShowConfetti(true);
+      // Auto-hide confetti after 10 seconds
+      const timer = setTimeout(() => setShowConfetti(false), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [tournament?.status]);
 
   const loadTournament = async () => {
     try {
@@ -165,6 +176,25 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
     return Math.round((votes / totalVotes) * 100);
   };
 
+  // Helper function to find the champion
+  const getChampion = (): { film: Film; matchup: Matchup } | null => {
+    if (!tournament || tournament.status !== 'completed') return null;
+
+    const finalRound = tournament.rounds[tournament.rounds.length - 1];
+    if (!finalRound || finalRound.matchups.length === 0) return null;
+
+    const finalMatchup = finalRound.matchups[0];
+    if (!finalMatchup.winner) return null;
+
+    const championFilm = finalMatchup.winner === finalMatchup.film1?.filmId
+      ? finalMatchup.film1
+      : finalMatchup.film2;
+
+    if (!championFilm) return null;
+
+    return { film: championFilm, matchup: finalMatchup };
+  };
+
   if (loading) {
     return (
       <div className="tournament-bracket loading">
@@ -191,9 +221,27 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
   }
 
   const { status, currentRound, rounds, votingWindow } = tournament;
+  const champion = getChampion();
 
   return (
     <div className="tournament-bracket">
+      {/* Confetti overlay */}
+      {showConfetti && (
+        <div className="confetti-container">
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="confetti-piece"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                backgroundColor: ['#00ff41', '#ff006e', '#8338ec', '#ffbe0b'][Math.floor(Math.random() * 4)]
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Status Bar */}
       <div className="tournament-status-bar">
         {status === 'completed' ? (
@@ -340,13 +388,35 @@ const TournamentBracket: React.FC<Props> = ({ channelId }) => {
         ))}
       </div>
 
-      {/* Champion Banner */}
-      {status === 'completed' && (
+      {/* Champion Banner - ENHANCED */}
+      {status === 'completed' && champion && (
         <div className="champion-banner">
           <div className="champion-trophy">🏆</div>
           <div className="champion-details">
-            <h2>Tournament Complete!</h2>
-            <p>Check the bracket above to see the champion</p>
+            <h2>Tournament Champion!</h2>
+            <div className="champion-film">
+              {champion.film.thumbnail && (
+                <img
+                  src={champion.film.thumbnail}
+                  alt={champion.film.title}
+                  className="champion-thumbnail"
+                />
+              )}
+              <div className="champion-info">
+                <div className="champion-seed">Seed #{champion.film.seed}</div>
+                <h3 className="champion-title">{champion.film.title}</h3>
+                {champion.film.creator && (
+                  <p className="champion-creator">by {champion.film.creator}</p>
+                )}
+                <div className="champion-stats">
+                  <span className="final-score">
+                    Final Score: {champion.matchup.winner === champion.film.filmId
+                      ? champion.matchup.votes1
+                      : champion.matchup.votes2} votes
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
